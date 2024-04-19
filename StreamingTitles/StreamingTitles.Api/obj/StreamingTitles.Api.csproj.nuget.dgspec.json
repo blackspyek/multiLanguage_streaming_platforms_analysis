@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj": {}
+    "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj": {
+    "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj",
+        "projectUniqueName": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj",
         "projectName": "StreamingTitles.Api",
-        "projectPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj",
-        "packagesPath": "C:\\Users\\BlackSpy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Api\\obj\\",
+        "projectPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Api\\StreamingTitles.Api.csproj",
+        "packagesPath": "C:\\Users\\Black\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\BlackSpy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Black\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -33,8 +33,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj": {
-                "projectPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj"
+              "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj": {
+                "projectPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj"
               }
             }
           }
@@ -96,20 +96,20 @@
         }
       }
     },
-    "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj": {
+    "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
+        "projectUniqueName": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
         "projectName": "StreamingTitles.Data",
-        "projectPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
-        "packagesPath": "C:\\Users\\BlackSpy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\obj\\",
+        "projectPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
+        "packagesPath": "C:\\Users\\Black\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\BlackSpy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Black\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

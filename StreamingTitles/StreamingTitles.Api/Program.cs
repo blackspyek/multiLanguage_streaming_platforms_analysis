@@ -1,6 +1,7 @@
 
 using Asp.Versioning;
 using StreamingTitles.Api;
+using StreamingTitles.Data.Helper;
 using StreamingTitles.Data.Model;
 using StreamingTitles.Data.Repositories;
 
@@ -36,8 +37,10 @@ void SeedData(IHost app)
     {
         var seed = scope.ServiceProvider.GetService<Seed>();
         seed.SeedDataContext();
+        seed.SeedDataFromXML("../StreamingTitles.Data/Data/netflix_titles.xml");
     }
 }
+
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
