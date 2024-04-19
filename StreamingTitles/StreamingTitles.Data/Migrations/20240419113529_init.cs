@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
@@ -51,10 +50,7 @@ namespace StreamingTitles.Data.Migrations
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     Type = table.Column<string>(type: "longtext", nullable: false),
                     TitleName = table.Column<string>(type: "longtext", nullable: false),
-                    Director = table.Column<string>(type: "longtext", nullable: false),
-                    Cast = table.Column<string>(type: "longtext", nullable: false),
                     Country = table.Column<string>(type: "longtext", nullable: false),
-                    Date_Added = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Release_Year = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

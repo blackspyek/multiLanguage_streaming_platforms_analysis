@@ -12,22 +12,6 @@ namespace StreamingTitles.Data.Repositories
             _ctx = ctx;
         }
 
-        public async Task<Category> getCategoryOrCreate(string name)
-        {
-            try
-            {
-                Category? category = await _ctx.Categories.FirstOrDefaultAsync(c => c.Name == name);
-                return category;
-            }
-            catch
-            {
-                Category newCategory = new Category { Name = name };
-                _ctx.Categories.Add(newCategory);
-                await _ctx.SaveChangesAsync();
-                return newCategory;
-            }
-
-        }
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
         {

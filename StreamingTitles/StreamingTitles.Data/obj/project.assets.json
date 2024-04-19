@@ -101,6 +101,23 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Http.Features/5.0.17": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "5.0.1",
+          "System.IO.Pipelines": "5.0.2"
+        },
+        "compile": {
+          "lib/net5.0/Microsoft.AspNetCore.Http.Features.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Microsoft.AspNetCore.Http.Features.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
         "type": "package",
         "compile": {
@@ -1456,6 +1473,25 @@
         "lib/netstandard2.0/K4os.Hash.xxHash.xml",
         "lib/netstandard2.1/K4os.Hash.xxHash.dll",
         "lib/netstandard2.1/K4os.Hash.xxHash.xml"
+      ]
+    },
+    "Microsoft.AspNetCore.Http.Features/5.0.17": {
+      "sha512": "3jG2xS+dx8DDCGV/F+STdPTg89lX3ao3dF/VEPvJaz3wzBIjuadipTtYNEXDIVuOPZwb6jdmhrX9jkzOIBm5cw==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.http.features/5.0.17",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/Microsoft.AspNetCore.Http.Features.dll",
+        "lib/net461/Microsoft.AspNetCore.Http.Features.xml",
+        "lib/net5.0/Microsoft.AspNetCore.Http.Features.dll",
+        "lib/net5.0/Microsoft.AspNetCore.Http.Features.xml",
+        "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.dll",
+        "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.xml",
+        "microsoft.aspnetcore.http.features.5.0.17.nupkg.sha512",
+        "microsoft.aspnetcore.http.features.nuspec"
       ]
     },
     "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
@@ -3772,29 +3808,30 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "AutoMapper >= 13.0.1",
+      "Microsoft.AspNetCore.Http.Features >= 5.0.17",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.4",
       "Microsoft.Extensions.Configuration.Abstractions >= 8.0.0",
       "MySql.EntityFrameworkCore >= 8.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Black\\.nuget\\packages\\": {},
+    "C:\\Users\\BlackSpy\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
+      "projectUniqueName": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
       "projectName": "StreamingTitles.Data",
-      "projectPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
-      "packagesPath": "C:\\Users\\Black\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Black\\Desktop\\ProjektIntegracja\\multiLanguage_streaming_platforms_analysis\\StreamingTitles\\StreamingTitles.Data\\obj\\",
+      "projectPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\StreamingTitles.Data.csproj",
+      "packagesPath": "C:\\Users\\BlackSpy\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Black\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\BlackSpy\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3830,6 +3867,10 @@
           "AutoMapper": {
             "target": "Package",
             "version": "[13.0.1, )"
+          },
+          "Microsoft.AspNetCore.Http.Features": {
+            "target": "Package",
+            "version": "[5.0.17, )"
           },
           "Microsoft.EntityFrameworkCore.Tools": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",

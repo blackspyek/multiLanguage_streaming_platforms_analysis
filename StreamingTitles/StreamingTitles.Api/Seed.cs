@@ -33,10 +33,7 @@ namespace StreamingTitles.Api
                             },
                             Type = "Movie",
                             TitleName = "The Shawshank Redemption",
-                            Director = "Frank Darabont",
-                            Cast = "Tim Robbins, Morgan Freeman, Bob Gunton",
                             Country = "United States",
-                            Date_Added = new DateTime(2021, 1, 1),
                             Release_Year = 1994
                         },
                         Category = new Category()
@@ -60,10 +57,7 @@ namespace StreamingTitles.Api
                             },
                             Type = "Movie",
                             TitleName = "The Godfather",
-                            Director = "Francis Ford Coppola",
-                            Cast = "Marlon Brando, Al Pacino, James Caan",
                             Country = "United States",
-                            Date_Added = new DateTime(2021, 1, 1),
                             Release_Year = 1972
                         },
                         Category = new Category()
@@ -122,10 +116,7 @@ namespace StreamingTitles.Api
                     },
                     Type = node["type"].InnerText,
                     TitleName = node["title"].InnerText,
-                    Director = node["director"].InnerText,
-                    Cast = node["cast"].InnerText,
                     Country = node["country"].InnerText,
-                    Date_Added = DateTime.Parse(node["date_added"].InnerText),
                     Release_Year = int.Parse(node["release_year"].InnerText),
                     TitleCategory = titleCategory
                 };

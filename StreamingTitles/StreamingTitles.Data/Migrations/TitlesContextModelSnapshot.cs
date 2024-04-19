@@ -55,18 +55,7 @@ namespace StreamingTitles.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Cast")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("Date_Added")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Director")
                         .IsRequired()
                         .HasColumnType("longtext");
 

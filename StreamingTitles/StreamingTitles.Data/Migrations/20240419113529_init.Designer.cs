@@ -11,7 +11,7 @@ using StreamingTitles.Data.Model;
 namespace StreamingTitles.Data.Migrations
 {
     [DbContext(typeof(TitlesContext))]
-    [Migration("20240417073309_init")]
+    [Migration("20240419113529_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -58,18 +58,7 @@ namespace StreamingTitles.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Cast")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("Date_Added")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Director")
                         .IsRequired()
                         .HasColumnType("longtext");
 

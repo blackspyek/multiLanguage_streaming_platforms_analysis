@@ -1,13 +1,5 @@
-﻿using StreamingTitles.Data.Model;
-using StreamingTitles.Data.Repositories;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using System.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StreamingTitles.Data.Helper
 {
@@ -18,10 +10,15 @@ namespace StreamingTitles.Data.Helper
         public XMLReader(string path)
         {
             XmlDocument doc = new System.Xml.XmlDocument();
-
             doc.Load(path);
+            XmlElement root = doc.DocumentElement;
+            this.nodes = root.ChildNodes;
 
-
+        }
+        public XMLReader(IFormFile file)
+        {
+            XmlDocument doc = new System.Xml.XmlDocument();
+            doc.Load(file.OpenReadStream());
             XmlElement root = doc.DocumentElement;
             this.nodes = root.ChildNodes;
         }
