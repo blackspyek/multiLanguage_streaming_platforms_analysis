@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using StreamingTitles.Data.Model;
+using System.Collections.Concurrent;
+using System.Xml.Linq;
 
 namespace StreamingTitles.Data.Repositories;
 public class TitlesRepository : ITitlesRepository
@@ -43,6 +45,165 @@ public class TitlesRepository : ITitlesRepository
         var titles = await query.Distinct().ToListAsync();
         return titles;
     }
+
+    public async Task<int> TitleExistsAsync(XDocument doc, string platformName)
+    {
+        var platform = await _platformRepository.GetPlatformByName(platformName);
+        if (platform == null)
+        {
+            platform = new Platform { Name = platformName };
+            _ctx.Platforms.Add(platform);
+            await _ctx.SaveChangesAsync();
+        }
+        var allGenres = _ctx.Categories.AsNoTracking().ToList();
+
+        var Genres = new ConcurrentDictionary<string, bool>();
+        doc.Root.Elements("row").AsParallel().ForAll(row =>
+        {
+            var listedIn = row.Element("listed_in").Value;
+            var genres = listedIn.Split(',');
+            foreach (var genre in genres)
+            {
+                Genres.TryAdd(genre.Trim().ToLower(), true);
+            }
+        });
+
+        foreach (var genre in Genres.Keys)
+        {
+            var temp = genre.Trim().ToLower();
+            if (!allGenres.Any(n => n.Name == temp))
+            {
+                Category newCategory = new Category { Name = temp };
+                _ctx.Categories.Add(newCategory);
+            }
+        }
+        _ctx.SaveChanges();
+        allGenres = _ctx.Categories.AsNoTracking().ToList();
+        /*
+         * 
+         * Transaction Default: read committed
+         * 
+         * 
+         */
+        doc.Root.Elements("row").AsParallel().ForAll(async row =>
+            {
+                var type = row.Element("type").Value;
+                var title = row.Element("title").Value;
+                var country = row.Element("country").Value;
+                var listedIn = row.Element("listed_in").Value;
+                var releaseYear = row.Element("release_year").Value;
+
+                if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(releaseYear) || string.IsNullOrEmpty(country) || string.IsNullOrEmpty(listedIn) || string.IsNullOrEmpty(type))
+                {
+                    return;
+                }
+                using (var titlesContext = new TitlesContext())
+                {
+                    try
+                    {
+                        var titleExists = titlesContext.Collection
+                            .Include(t => t.TitlePlatform)
+                            .Include(t => t.TitleCategory)
+                            .AsNoTracking().FirstOrDefault(
+                                t => t.TitleName == title && t.Release_Year == int.Parse(releaseYear));
+
+                        var categoryNames = listedIn.Split(',');
+                        string temp = "";
+                        Category categoryEntity;
+
+                        if (titleExists != null)
+                        {
+                            if (titleExists.TitlePlatform == null)
+                                titleExists.TitlePlatform = new List<TitlePlatform>();
+
+                            if (titleExists.TitleCategory == null)
+                                titleExists.TitleCategory = new List<TitleCategory>();
+
+                            if (titleExists.TitlePlatform.Any(tp => tp.PlatformId == platform.Id) == false)
+                            {
+                                TitlePlatform titlePlatform = new TitlePlatform
+                                {
+                                    PlatformId = platform.Id,
+                                    TitleId = titleExists.Id
+                                };
+                                titleExists.TitlePlatform.Add(titlePlatform);
+                            }
+
+
+                            foreach (var categoryName in categoryNames)
+                            {
+                                temp = categoryName.Trim().ToLower();
+                                categoryEntity = allGenres.FirstOrDefault(n => n.Name == temp);
+                                if (titleExists.TitleCategory.Any(tm => tm.CategoryId == categoryEntity.Id) == false)
+                                {
+
+                                    TitleCategory titleCategory = new TitleCategory
+                                    {
+                                        CategoryId = categoryEntity.Id,
+                                        TitleId = titleExists.Id
+                                    };
+                                    titleExists.TitleCategory.Add(titleCategory);
+
+                                }
+                                titlesContext.Collection.Update(titleExists);
+
+                            }
+
+                            titlesContext.SaveChanges();
+                        }
+                        else
+                        {
+                            Title newTitle = new Title
+                            {
+                                Type = type,
+                                TitleName = title,
+                                Country = country,
+                                Release_Year = int.Parse(releaseYear)
+                            };
+
+                            TitlePlatform titlePlatform = new TitlePlatform
+                            {
+                                PlatformId = platform.Id,
+                                TitleId = newTitle.Id
+                            };
+                            if (newTitle.TitlePlatform == null)
+                                newTitle.TitlePlatform = new List<TitlePlatform>();
+
+                            if (newTitle.TitleCategory == null)
+                                newTitle.TitleCategory = new List<TitleCategory>();
+
+
+                            foreach (var categoryName in categoryNames)
+                            {
+                                temp = categoryName.Trim().ToLower();
+                                categoryEntity = allGenres.FirstOrDefault(n => n.Name == temp);
+                                TitleCategory titleCategory = new TitleCategory
+                                {
+                                    CategoryId = categoryEntity.Id,
+                                    TitleId = newTitle.Id
+                                };
+                                newTitle.TitleCategory.Add(titleCategory);
+                            }
+
+                            newTitle.TitlePlatform.Add(titlePlatform);
+                            titlesContext.Collection.Add(newTitle);
+                            titlesContext.SaveChanges();
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        return;
+                    }
+
+                }
+
+            });
+        return 1;
+
+    }
+
     public async Task<Platform> GetPlatformByName(string name)
     {
         try

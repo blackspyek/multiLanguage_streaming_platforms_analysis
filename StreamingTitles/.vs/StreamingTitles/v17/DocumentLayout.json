@@ -5,6 +5,7 @@
     {
       "AbsoluteMoniker": "D:0:0:{16AC6DB7-F4F6-45AC-93DD-34B931A2D2AB}|StreamingTitles.Data\\StreamingTitles.Data.csproj|c:\\users\\blackspy\\desktop\\pollub\\integracja\\projekt\\streamingtitles\\streamingtitles.data\\repositories\\titlesrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{16AC6DB7-F4F6-45AC-93DD-34B931A2D2AB}|StreamingTitles.Data\\StreamingTitles.Data.csproj|solutionrelative:streamingtitles.data\\repositories\\titlesrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+<<<<<<< Updated upstream
     },
     {
       "AbsoluteMoniker": "D:0:0:{E2F87C10-2D37-4C54-82A9-C1785399040C}|StreamingTitles.Api\\StreamingTitles.Api.csproj|c:\\users\\blackspy\\desktop\\pollub\\integracja\\projekt\\streamingtitles\\streamingtitles.api\\controllers\\titlescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -37,6 +38,8 @@
     {
       "AbsoluteMoniker": "D:0:0:{16AC6DB7-F4F6-45AC-93DD-34B931A2D2AB}|StreamingTitles.Data\\StreamingTitles.Data.csproj|c:\\users\\blackspy\\desktop\\pollub\\integracja\\projekt\\streamingtitles\\streamingtitles.data\\repositories\\categoryrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{16AC6DB7-F4F6-45AC-93DD-34B931A2D2AB}|StreamingTitles.Data\\StreamingTitles.Data.csproj|solutionrelative:streamingtitles.data\\repositories\\categoryrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+=======
+>>>>>>> Stashed changes
     }
   ],
   "DocumentGroupContainers": [
@@ -46,9 +49,10 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 1,
           "Children": [
             {
+<<<<<<< Updated upstream
               "$type": "Document",
               "DocumentIndex": 4,
               "Title": "20240419113529_init.cs",
@@ -75,11 +79,14 @@
               "EditorCaption": ""
             },
             {
+=======
+>>>>>>> Stashed changes
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 8,
               "Title": "CategoryRepository.cs",
               "DocumentMoniker": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\Repositories\\CategoryRepository.cs",
@@ -145,12 +152,15 @@
             },
             {
               "$type": "Document",
+=======
+>>>>>>> Stashed changes
               "DocumentIndex": 0,
               "Title": "TitlesRepository.cs",
               "DocumentMoniker": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\Repositories\\TitlesRepository.cs",
               "RelativeDocumentMoniker": "StreamingTitles.Data\\Repositories\\TitlesRepository.cs",
               "ToolTip": "C:\\Users\\BlackSpy\\Desktop\\Pollub\\Integracja\\Projekt\\StreamingTitles\\StreamingTitles.Data\\Repositories\\TitlesRepository.cs",
               "RelativeToolTip": "StreamingTitles.Data\\Repositories\\TitlesRepository.cs",
+<<<<<<< Updated upstream
               "ViewState": "AQIAAHoAAAAAAAAAAAAIwIoAAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-19T09:12:48.756Z",
@@ -167,6 +177,11 @@
               "ViewState": "AQIAALoAAAAAAAAAAAAWwMYAAAAOAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-16T10:12:23.038Z",
+=======
+              "ViewState": "AQIAAEUAAAAAAAAAAAAAAFAAAAA8AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-16T16:11:23.608Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             }
           ]

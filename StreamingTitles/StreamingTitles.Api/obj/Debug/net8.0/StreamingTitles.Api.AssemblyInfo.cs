@@ -14,7 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StreamingTitles.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< Updated upstream
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dc9f4869addcddac55d674893e4d94f6ade84b3b")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13ac551791c8c6f6a9ca65a47f3082014eb594ed")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("StreamingTitles.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StreamingTitles.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

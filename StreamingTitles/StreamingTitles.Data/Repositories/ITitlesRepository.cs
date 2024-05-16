@@ -1,5 +1,6 @@
 ﻿
 using StreamingTitles.Data.Model;
+using System.Xml.Linq;
 
 namespace StreamingTitles.Data.Repositories
 {
@@ -15,6 +16,8 @@ namespace StreamingTitles.Data.Repositories
         Task<bool> UpdateTitle(Title title);
         Task<bool> DeleteTitle(Title title);
         Task<bool> Save();
+
+        Task<int> TitleExistsAsync(XDocument doc, string platformName);
 
         // TODO: Repair an error when inserting same title in the same platform or other platform
         // TODO: Create InsertFromCSV method

@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<row>
+		<show_id>s1</show_id>
+		<type>Movie</type>
+		<title>Dick Johnson Is Dead</title>
+		<director>Kirsten Johnson</director>
+		<cast></cast>
+		<country>United States</country>
+		<date_added>September 25, 2021</date_added>
+		<release_year>2020</release_year>
+		<rating>PG-13</rating>
+		<duration>90 min</duration>
+		<listed_in>Documentaries, Comedy</listed_in>
+		<description>As her father nears the end of his life, filmmaker Kirsten Johnson stages his death in inventive and comical ways to help them both face the inevitable.</description>
+		<FIELD13></FIELD13>
+		<FIELD14></FIELD14>
+		<FIELD15></FIELD15>
+		<FIELD16></FIELD16>
+		<FIELD17></FIELD17>
+		<FIELD18></FIELD18>
+		<FIELD19></FIELD19>
+		<FIELD20></FIELD20>
+		<FIELD21></FIELD21>
+		<FIELD22></FIELD22>
+		<FIELD23></FIELD23>
+		<FIELD24></FIELD24>
+		<FIELD25></FIELD25>
+		<FIELD26></FIELD26>
+	</row>
+	<row>
+		<show_id>s2</show_id>
+		<type>TV Show</type>
+		<title>Blood &amp; Water</title>
+		<director></director>
+		<cast>Ama Qamata, Khosi Ngema, Gail Mabalane, Thabang Molaba, Dillon Windvogel, Natasha Thahane, Arno Greeff, Xolile Tshabalala, Getmore Sithole, Cindy Mahlangu, Ryle De Morny, Greteli Fincham, Sello Maake Ka-Ncube, Odwa Gwanya, Mekaila Mathys, Sandi Schultz, Duane Williams, Shamilla Miller, Patrick Mofokeng</cast>
+		<country>South Africa</country>
+		<date_added>September 24, 2021</date_added>
+		<release_year>2021</release_year>
+		<rating>TV-MA</rating>
+		<duration>2 Seasons</duration>
+		<listed_in>International TV Shows, TV Dramas, TV Mysteries, Comedy</listed_in>
+		<description>After crossing paths at a party, a Cape Town teen sets out to prove whether a private-school swimming star is her sister who was abducted at birth.</description>
+		<FIELD13></FIELD13>
+		<FIELD14></FIELD14>
+		<FIELD15></FIELD15>
+		<FIELD16></FIELD16>
+		<FIELD17></FIELD17>
+		<FIELD18></FIELD18>
+		<FIELD19></FIELD19>
+		<FIELD20></FIELD20>
+		<FIELD21></FIELD21>
+		<FIELD22></FIELD22>
+		<FIELD23></FIELD23>
+		<FIELD24></FIELD24>
+		<FIELD25></FIELD25>
+		<FIELD26></FIELD26>
+	</row>
+	<row>
+		<show_id>s3</show_id>
+		<type>TV Show</type>
+		<title>Ganglands</title>
+		<director>Julien Leclercq</director>
+		<cast>Sami Bouajila, Tracy Gotoas, Samuel Jouy, Nabiha Akkari, Sofia Lesaffre, Salim Kechiouche, Noureddine Farihi, Geert Van Rampelberg, Bakary Diombera</cast>
+		<country></country>
+		<date_added>September 24, 2021</date_added>
+		<release_year>2021</release_year>
+		<rating>TV-MA</rating>
+		<duration>1 Season</duration>
+		<listed_in>Crime TV Shows, International TV Shows, TV Action &amp; Adventure</listed_in>
+		<description>To protect his family from a powerful drug lord, skilled thief Mehdi and his expert team of robbers are pulled into a violent and deadly turf war.</description>
+		<FIELD13></FIELD13>
+		<FIELD14></FIELD14>
+		<FIELD15></FIELD15>
+		<FIELD16></FIELD16>
+		<FIELD17></FIELD17>
+		<FIELD18></FIELD18>
+		<FIELD19></FIELD19>
+		<FIELD20></FIELD20>
+		<FIELD21></FIELD21>
+		<FIELD22></FIELD22>
+		<FIELD23></FIELD23>
+		<FIELD24></FIELD24>
+		<FIELD25></FIELD25>
+		<FIELD26></FIELD26>
+	</row>
+</root>

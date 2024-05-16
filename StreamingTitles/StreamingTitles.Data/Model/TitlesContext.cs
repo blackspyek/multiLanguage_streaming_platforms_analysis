@@ -7,6 +7,12 @@ namespace StreamingTitles.Data.Model
     {
         private readonly IConfiguration _config;
         private readonly string _connectionString;
+
+        public TitlesContext()
+        {
+            _connectionString = "server=localhost;port=3307;database=StreamingTitles;user id=root;password=root";
+        }
+
         public TitlesContext(IConfiguration config)
         {
             _config = config;
@@ -29,6 +35,7 @@ namespace StreamingTitles.Data.Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             // TitleCategory
             modelBuilder.Entity<TitleCategory>()
                 .HasKey(tc => new { tc.TitleId, tc.CategoryId });

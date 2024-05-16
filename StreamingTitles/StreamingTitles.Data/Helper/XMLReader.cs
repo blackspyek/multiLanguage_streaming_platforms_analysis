@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace StreamingTitles.Data.Helper
 {
@@ -22,9 +23,31 @@ namespace StreamingTitles.Data.Helper
             XmlElement root = doc.DocumentElement;
             this.nodes = root.ChildNodes;
         }
+        public XMLReader()
+        {
+
+        }
+
         public XmlNodeList GetNodes()
         {
             return this.nodes;
+        }
+
+        public async Task<XDocument> ProcessData(IFormFile data)
+        {
+            if (data.Length > 0 && data.ContentType == "application/xml")
+            {
+                using (var reader = new StreamReader(data.OpenReadStream()))
+                {
+                    string xmlString = await reader.ReadToEndAsync();
+                    XDocument doc = XDocument.Parse(xmlString);
+                    return doc;
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Invalid file. Please upload a valid XML file.");
+            }
         }
     }
 }

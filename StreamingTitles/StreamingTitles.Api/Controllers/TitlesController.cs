@@ -4,7 +4,6 @@ using StreamingTitles.Data.DTO;
 using StreamingTitles.Data.Helper;
 using StreamingTitles.Data.Model;
 using StreamingTitles.Data.Repositories;
-using System.Xml;
 
 namespace StreamingTitles.Api.Controllers
 {
@@ -161,16 +160,15 @@ namespace StreamingTitles.Api.Controllers
         [HttpPost("upload")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> UploadTitle([FromQuery] String platformName, [FromForm] IFormFile file)
+        public async Task<IActionResult> UploadTitle([FromQuery] string platformName, [FromForm] IFormFile file)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
             if (file == null || file.Length == 0)
             {
-                return BadRequest(new
-                {
-                    StatusCode = 400,
-                    message = "File is null or empty"
-                });
+                return BadRequest(new { StatusCode = 400, message = "File is null or empty" });
             }
+<<<<<<< Updated upstream
             var platform = await _platformRepository.GetPlatformByName(platformName);
 
             if (platform == null)
@@ -220,7 +218,16 @@ namespace StreamingTitles.Api.Controllers
                 }
             }
             return Ok($"Successfully created! {nodes.Count - howManySkipped} titles created, {howManySkipped} titles skipped");
+=======
+>>>>>>> Stashed changes
 
+            var Reader = new XMLReader();
+            var data = await Reader.ProcessData(file);
+            int skipped = _titlesRepo.TitleExistsAsync(data, platformName).Result;
+
+            //var skipped = _titlesRepo.TitleExistsAsync(nodes, platformName).Result;
+            watch.Stop();
+            return Ok(new { Elapsed = watch.ElapsedMilliseconds, Skipped = 1 });
         }
         [HttpPut]
         [ProducesResponseType(204)]
