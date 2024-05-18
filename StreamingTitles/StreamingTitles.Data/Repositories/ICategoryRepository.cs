@@ -15,5 +15,7 @@ namespace StreamingTitles.Data.Repositories
         Task<bool> DeleteCategory(Category category);
         Task<bool> Save();
         Task<bool> CategoryExists(int categoryid);
+        Task<bool> CategoryTitleExists(int testCatId, int testTitleId);
+
     }
 }

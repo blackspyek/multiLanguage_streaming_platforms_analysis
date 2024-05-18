@@ -168,58 +168,6 @@ namespace StreamingTitles.Api.Controllers
             {
                 return BadRequest(new { StatusCode = 400, message = "File is null or empty" });
             }
-<<<<<<< Updated upstream
-            var platform = await _platformRepository.GetPlatformByName(platformName);
-
-            if (platform == null)
-            {
-                platform = new Platform()
-                {
-                    Name = platformName
-                };
-                await _platformRepository.CreatePlatform(platform);
-            }
-            var platformDTO = _mapper.Map<PlatformDTO>(platform);
-
-            var reader = new XMLReader(file);
-            var nodes = reader.GetNodes();
-            var howManySkipped = 0;
-            foreach (XmlNode node in nodes)
-            {
-                string type = node["type"].InnerText.Trim().ToLower();
-                string titleName = node["title"].InnerText.Trim().ToLower();
-                string director = node["director"].InnerText.Trim().ToLower();
-                string cast = node["cast"].InnerText.Trim().ToLower();
-                string country = node["country"].InnerText.Trim().ToLower();
-                string listedIn = node["listed_in"].InnerText.Trim().ToLower();
-                string year = node["release_year"].InnerText.Trim().ToLower();
-                if (string.IsNullOrEmpty(year) || string.IsNullOrEmpty(type) || string.IsNullOrEmpty(country) || string.IsNullOrEmpty(listedIn))
-                {
-                    howManySkipped++;
-                    continue;
-                }
-                int releaseYear = int.Parse(year);
-
-                var title = new Title
-                {
-                    Type = type,
-                    TitleName = titleName,
-                    Country = country,
-                    Release_Year = releaseYear,
-                };
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                if (!await _titlesRepo.CreateTitleFromObject(platformDTO.Id, listedIn, title))
-                {
-                    ModelState.AddModelError("", $"Something went wrong saving the title {title.TitleName}");
-                    return StatusCode(500, ModelState);
-                }
-            }
-            return Ok($"Successfully created! {nodes.Count - howManySkipped} titles created, {howManySkipped} titles skipped");
-=======
->>>>>>> Stashed changes
 
             var Reader = new XMLReader();
             var data = await Reader.ProcessData(file);

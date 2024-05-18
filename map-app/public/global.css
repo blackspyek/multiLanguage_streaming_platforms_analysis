@@ -1,0 +1,36 @@
+.login-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    justify-self: end;
+        /* Align the button to the end of its container */
+        margin-left: auto;
+        /* Push the button to the right */
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+}
+
+.login-btn:focus {
+    outline: none;
+}
+.App-header {
+    padding: 1%;
+    background-color: #282c34;
+    display: grid;
+    flex-direction: row !important;
+    color: white;
+    max-height: 10vh !important;
+    min-height: 1vh !important;
+    grid-template-columns: 90% 10%;
+}

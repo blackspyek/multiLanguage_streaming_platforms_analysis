@@ -39,12 +39,11 @@ namespace StreamingTitles.Data.Repositories
             return Save();
         }
 
-        public Task<Platform> GetPlatformByName(string platformname)
+        public async Task<Platform> GetPlatformByName(string platformname)
         {
-            Platform? platform = _ctx.Platforms.AsNoTracking().FirstOrDefault(c => c.Name == platformname);
-            return Task.FromResult(platform);
+            Platform? platform = await _ctx.Platforms.AsNoTracking().FirstOrDefaultAsync(c => c.Name == platformname);
+            return platform;
         }
-
         public Task<bool> DeletePlatform(Platform platform)
         {
             _ctx.Remove(platform);
@@ -55,6 +54,11 @@ namespace StreamingTitles.Data.Repositories
         public async Task<ICollection<Title>> GetTitlesByPlatformId(int platformid)
         {
             return _ctx.TitlePlatform.AsNoTracking().Where(tc => tc.PlatformId == platformid).Select(tc => tc.Title).ToList();
+        }
+
+        public Task<bool> PlatformTitleExists(int testPlatId, int testTitleId)
+        {
+            return Task.FromResult(_ctx.TitlePlatform.AsNoTracking().Any(tp => tp.PlatformId == testPlatId && tp.TitleId == testTitleId));
         }
     }
 }

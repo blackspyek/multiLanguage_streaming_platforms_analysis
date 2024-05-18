@@ -247,36 +247,13 @@ public class TitlesRepository : ITitlesRepository
         return titles;
     }
 
-    public async Task<bool> CreateTitleFromObject(int platformId, string categories, Title title)
+    public async Task<bool> CreateTitleFromObject(List<TitlePlatform> platforms, List<TitleCategory> categories, List<Title> title)
     {
-        var platformEntity = _ctx.Platforms.FirstOrDefault(p => p.Id == platformId);
-
-        var categoryNames = categories.Split(',');
-        foreach (var categoryName in categoryNames)
-        {
-            var categoryEntity = _ctx.Categories.FirstOrDefault(c => c.Name == categoryName);
-            if (categoryEntity == null)
-            {
-                categoryEntity = new Category { Name = categoryName };
-                _ctx.Add(categoryEntity);
-            }
-            var titleCategory = new TitleCategory
-            {
-                Category = categoryEntity,
-                Title = title
-            };
-            _ctx.Add(titleCategory);
-        }
-
-        var titlePlatform = new TitlePlatform
-        {
-            Platform = platformEntity,
-            Title = title
-        };
-        _ctx.Add(titlePlatform);
-
-        _ctx.Add(title);
+        _ctx.AddRange(categories);
+        _ctx.AddRange(platforms);
+        _ctx.AddRange(title);
         return await Save();
+
     }
 
     public Task<bool> CreateTitle(int platformId, int categoryId, Title title)

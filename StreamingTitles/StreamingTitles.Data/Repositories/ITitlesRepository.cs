@@ -12,7 +12,7 @@ namespace StreamingTitles.Data.Repositories
         Task<IEnumerable<Title>> GetTitlesByYearAsync(int year);
         Task<IEnumerable<Title>> GetTitlesByReleaseYearRangeAsync(List<string> genreNames, List<string> platformNames, int startYear, int endYear);
         Task<bool> CreateTitle(int platformId, int categoryId, Title title);
-        Task<bool> CreateTitleFromObject(int platformId, string categories, Title title);
+        Task<bool> CreateTitleFromObject(List<TitlePlatform> platforms, List<TitleCategory> categories, List<Title> title);
         Task<bool> UpdateTitle(Title title);
         Task<bool> DeleteTitle(Title title);
         Task<bool> Save();

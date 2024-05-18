@@ -14,5 +14,7 @@ namespace StreamingTitles.Data.Repositories
         Task<bool> DeletePlatform(Platform platform);
 
         Task<bool> Save();
+        Task<bool> PlatformTitleExists(int testPlatId, int testTitleId);
+
     }
 }

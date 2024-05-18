@@ -72,5 +72,10 @@ namespace StreamingTitles.Data.Repositories
         {
             return _ctx.Categories.AnyAsync(c => c.Id == categoryid);
         }
+
+        public Task<bool> CategoryTitleExists(int testCatId, int testTitleId)
+        {
+            return _ctx.TitleCategories.AsNoTracking().AnyAsync(tc => tc.CategoryId == testCatId && tc.TitleId == testTitleId);
+        }
     }
 }

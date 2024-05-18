@@ -1,0 +1,75 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+.loginForm {
+  background-color: #1e90ff;
+  padding: 2rem;
+  border-radius: 10px;
+}
+h1 {
+  text-decoration: none;
+  color: #ffffffe4;
+  font-family: "Inter";
+  font-size: 54px;
+  font-weight: 700;
+}
+
+form .formLine {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+form .formLine input {
+  border-radius: 5px;
+  border: none;
+}
+
+.formLine label {
+  color: #ffffffb0;
+  font-family: "Inter";
+  font-size: 24px;
+  font-weight: 700;
+  min-width: 300px;
+}
+
+.formLine input {
+  padding: 0.1rem;
+  font-size: 24px;
+  border-radius: 25px;
+}
+.focusedLine label {
+  color: white;
+}
+.btn {
+  background-color: #ffffff;
+  color: #1e8fff;
+  font-size: 24px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin: 1rem;
+}
+a {
+  text-decoration: none;
+  color: #ffffffe4;
+  font-family: "Inter";
+  font-size: 16px;
+  font-weight: 600;
+}
+.info {
+  color: #ffffffe4;
+  font-family: "Inter";
+  font-size: 16px;
+  font-weight: 400;
+}
+.logoMargin {
+  margin: 1rem;
+}
