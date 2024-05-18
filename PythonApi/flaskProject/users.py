@@ -22,4 +22,8 @@ def get_users():
     return jsonify({
         "users": result
     }), 200
-
+@users.route('/role')
+@jwt_required()
+def get_user_roles():
+    claims = get_jwt()
+    return jsonify({'role': claims['role']}), 200

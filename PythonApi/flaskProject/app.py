@@ -1,6 +1,7 @@
 import time
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 from extensions import db, jwt, validate_database
 from auth import auth
 from models import User, TokenBlocklist
@@ -8,12 +9,13 @@ from users import users
 from admins import ADMIN_ACCOUNT_USERNAMES_LIST as admin_usernames
 import alembic.config
 def create_app():
-    time.sleep(10)
     validate_database()
     alembic.config.main(argv=['upgrade', 'head'])
 
 
     app = Flask(__name__)
+    CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
+
     app.config.from_prefixed_env()
 
     # Initialize the extensions section
@@ -32,6 +34,9 @@ def create_app():
         return User.query.filter_by(username=identity).one_or_none()
 
     # additional claims
+    """
+    This decorator function triggers whenever you create a new access token (e.g., when a user successfully logs in).
+    """
     @jwt.additional_claims_loader
     def add_claims_to_access_token(identity):
         if identity in admin_usernames:
