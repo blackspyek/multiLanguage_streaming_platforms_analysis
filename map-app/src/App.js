@@ -11,7 +11,7 @@ import Unauthorized from "./components/Unauthorized";
 import Admin from "./components/Admin";
 import PersistLogin from "./components/PersistLogin";
 import Home from "./pages/Home/HomePage";
-
+import UploadStreaming from "./pages/UploadStreaming/UploadStreaming";
 const ROLES = {
   ADMIN: "admin",
   USER: "user",
@@ -32,6 +32,7 @@ function App() {
           {/* private routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
             <Route path="admin" element={<Admin />} />
+            <Route path="uploadstream" element={<UploadStreaming />} />
           </Route>
         </Route>
         {/* 404 */}

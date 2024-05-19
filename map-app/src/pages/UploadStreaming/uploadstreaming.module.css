@@ -1,0 +1,76 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+.form_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10%;
+}
+.form_wrapper form {
+  display: flex;
+  flex-direction: column;
+  max-width: 20%;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom_file {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 2rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  color: black;
+  font-family: "Inter";
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 10px 10px 0 0;
+}
+.file {
+  padding: 0.5rem;
+}
+
+.custom_file:hover {
+  background-color: lightcoral;
+}
+form button {
+  background-color: black;
+  color: white;
+  font-size: 24px;
+  font-weight: 400;
+  border: none;
+  border-radius: 0 0 10px 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+form button:hover {
+  background-color: #333;
+}
+form button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+.totalText {
+  font-size: 24px;
+  font-weight: 700;
+  font-family: "Inter";
+  color: #000000;
+  max-width: 150px;
+  margin: 1rem;
+}
+.remainingText {
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "Inter";
+  color: #000000;
+  max-width: 150px;
+  margin: 1rem;
+}

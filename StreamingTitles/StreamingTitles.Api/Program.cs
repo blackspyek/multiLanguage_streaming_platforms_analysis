@@ -1,7 +1,6 @@
 
 using Asp.Versioning;
 using StreamingTitles.Api;
-using StreamingTitles.Data.Helper;
 using StreamingTitles.Data.Model;
 using StreamingTitles.Data.Repositories;
 
@@ -17,16 +16,27 @@ builder.Services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
 });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000", "http://localhost:5000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "StreamingTitles.Api", Version = "v1" });
 });
-
+builder.Services.AddSignalR();
 builder.Services.AddTransient<TitlesContext>();
 builder.Services.AddTransient<ITitlesRepository, TitlesRepository>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IPlatformRepository, PlatformRepository>();
+
 var app = builder.Build();
 if (args.Length == 1 && args[0].ToLower() == "seeddata")
     SeedData(app);
@@ -50,7 +60,8 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty; // Set the Swagger UI at the root URL
 });
 app.UseAuthorization();
-
+app.UseCors();
 app.MapControllers();
+app.MapHub<ProgressHub>("/progressHub");
 
 app.Run();

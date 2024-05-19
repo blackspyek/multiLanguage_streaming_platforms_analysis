@@ -11,7 +11,7 @@ using StreamingTitles.Data.Model;
 namespace StreamingTitles.Data.Migrations
 {
     [DbContext(typeof(TitlesContext))]
-    [Migration("20240516162854_init")]
+    [Migration("20240519124212_init")]
     partial class init
     {
         /// <inheritdoc />

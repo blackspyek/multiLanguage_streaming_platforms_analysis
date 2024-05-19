@@ -35,7 +35,7 @@ namespace StreamingTitles.Data.Helper
 
         public async Task<XDocument> ProcessData(IFormFile data)
         {
-            if (data.Length > 0 && data.ContentType == "application/xml")
+            if (data.Length > 0 && data.FileName.EndsWith(".xml"))
             {
                 using (var reader = new StreamReader(data.OpenReadStream()))
                 {

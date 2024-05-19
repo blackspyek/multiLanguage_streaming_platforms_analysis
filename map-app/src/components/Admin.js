@@ -8,6 +8,7 @@ function Admin() {
       <br />
       <Users />
       <br />
+
       <Link to="/">Go to Home</Link>
     </section>
   );

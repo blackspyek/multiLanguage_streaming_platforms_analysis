@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using StreamingTitles.Data.Model;
 using System.Collections.Concurrent;
@@ -10,11 +11,13 @@ public class TitlesRepository : ITitlesRepository
     private readonly TitlesContext _ctx;
     private readonly IMapper _mapper;
     private readonly IPlatformRepository _platformRepository;
-    public TitlesRepository(TitlesContext ctx, IMapper mapper, IPlatformRepository platformRepository)
+    private readonly IHubContext<ProgressHub> _hubContext;
+    public TitlesRepository(TitlesContext ctx, IMapper mapper, IPlatformRepository platformRepository, IHubContext<ProgressHub> hubContext)
     {
         _ctx = ctx;
         _mapper = mapper;
         _platformRepository = platformRepository;
+        _hubContext = hubContext = hubContext;
     }
     public async Task<IEnumerable<Title>> GetTitlesByReleaseYearRangeAsync(List<string> genreNames, List<string> platformNames, int startYear = 0, int endYear = 0)
     {
@@ -58,6 +61,8 @@ public class TitlesRepository : ITitlesRepository
         var allGenres = _ctx.Categories.AsNoTracking().ToList();
 
         var Genres = new ConcurrentDictionary<string, bool>();
+
+
         doc.Root.Elements("row").AsParallel().ForAll(row =>
         {
             var listedIn = row.Element("listed_in").Value;
@@ -79,6 +84,8 @@ public class TitlesRepository : ITitlesRepository
         }
         _ctx.SaveChanges();
         allGenres = _ctx.Categories.AsNoTracking().ToList();
+        var totalRowCount = doc.Root.Elements("row").Count();
+        var rowsProcessed = 0;
         /*
          * 
          * Transaction Default: read committed
@@ -188,6 +195,11 @@ public class TitlesRepository : ITitlesRepository
                             newTitle.TitlePlatform.Add(titlePlatform);
                             titlesContext.Collection.Add(newTitle);
                             titlesContext.SaveChanges();
+
+
+                            Interlocked.Increment(ref rowsProcessed);
+
+                            await _hubContext.Clients.All.SendAsync("ProgressUpdate", totalRowCount - rowsProcessed);
 
                         }
                     }

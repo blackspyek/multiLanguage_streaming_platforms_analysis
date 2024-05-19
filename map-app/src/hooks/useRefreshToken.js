@@ -10,9 +10,6 @@ function useRefreshToken() {
       withCredentials: true,
     });
     setAuth((prev) => {
-      console.log(JSON.stringify(prev));
-      console.log(response.data.access_token);
-      console.log(response.data);
       return {
         ...prev,
         role: response.data.role,
