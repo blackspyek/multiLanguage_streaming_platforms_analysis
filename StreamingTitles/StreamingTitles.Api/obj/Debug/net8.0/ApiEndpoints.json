@@ -601,6 +601,37 @@
   },
   {
     "ContainingType": "StreamingTitles.Api.Controllers.TitlesController",
+    "Method": "CreateTitleFromApi",
+    "RelativePath": "api/titles/titleapi",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "titleCreate",
+        "Type": "StreamingTitles.Data.DTO.TitleApiDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 204
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "StreamingTitles.Api.Controllers.TitlesController",
     "Method": "UploadTitle",
     "RelativePath": "api/titles/upload",
     "HttpMethod": "POST",

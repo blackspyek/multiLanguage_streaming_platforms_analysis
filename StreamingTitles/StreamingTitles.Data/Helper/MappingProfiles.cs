@@ -12,6 +12,7 @@ namespace StreamingTitles.Data.Helper
             CreateMap<Title, TitleDTO>();
             CreateMap<Title, TitleDataDTO>();
             CreateMap<TitleDTO, Title>();
+            CreateMap<TitleApiDTO, Title>();
             // Category
             CreateMap<Category, CategoryDTO>();
             CreateMap<CategoryDTO, Category>();

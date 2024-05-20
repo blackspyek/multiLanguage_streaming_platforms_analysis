@@ -19,8 +19,8 @@ namespace StreamingTitles.Data.Repositories
 
         Task<int> TitleExistsAsync(XDocument doc, string platformName);
 
-        // TODO: Repair an error when inserting same title in the same platform or other platform
-        // TODO: Create InsertFromCSV method
+        Task<bool> CreateTitleFromObjectApi(string platformNames, string categoryNames, Title title);
+
 
 
     }

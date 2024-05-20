@@ -121,7 +121,44 @@ namespace StreamingTitles.Api.Controllers
                 });
             }
         }
+        [HttpPost("titleapi")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> CreateTitleFromApi([FromBody] TitleApiDTO titleCreate)
+        {
+            if (titleCreate == null)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = 400,
+                    message = "Title is null"
+                });
+            }
+            var platformNames = titleCreate.platformNames;
+            var categoryNames = titleCreate.categoryNames;
 
+            var title = _titlesRepo.GetTitlesAsync()
+                .Result.FirstOrDefault(c => c.TitleName == titleCreate.TitleName.TrimEnd()
+                                                       && c.Release_Year == titleCreate.Release_Year);
+            if (title != null)
+            {
+                ModelState.AddModelError("", "Title already exists");
+                return StatusCode(422, ModelState);
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var titleMap = _mapper.Map<Title>(titleCreate);
+
+            if (!await _titlesRepo.CreateTitleFromObjectApi(platformNames, categoryNames, titleMap))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving the title {titleCreate.TitleName}");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Successfully created!");
+
+        }
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

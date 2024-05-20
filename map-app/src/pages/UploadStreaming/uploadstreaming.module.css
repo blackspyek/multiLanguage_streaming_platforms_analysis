@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 .container {
   display: flex;
   flex-direction: column;
@@ -7,12 +8,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 10%;
+  margin-top: 5rem;
 }
 .form_wrapper form {
   display: flex;
   flex-direction: column;
   max-width: 20%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
 input[type="file"] {
@@ -28,7 +31,7 @@ input[type="file"] {
   flex-direction: column;
   background-color: white;
   color: black;
-  font-family: "Inter";
+  font-family: "Nunito";
   font-size: 18px;
   font-weight: 700;
   border-radius: 10px 10px 0 0;
@@ -40,7 +43,7 @@ input[type="file"] {
 .custom_file:hover {
   background-color: lightcoral;
 }
-form button {
+form .submit {
   background-color: black;
   color: white;
   font-size: 24px;
@@ -50,10 +53,10 @@ form button {
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
-form button:hover {
+form .submit:hover {
   background-color: #333;
 }
-form button:disabled {
+form .submit:disabled {
   background-color: #ccc;
   color: #666;
   cursor: not-allowed;
@@ -61,7 +64,7 @@ form button:disabled {
 .totalText {
   font-size: 24px;
   font-weight: 700;
-  font-family: "Inter";
+  font-family: "Nunito";
   color: #000000;
   max-width: 150px;
   margin: 1rem;
@@ -69,8 +72,80 @@ form button:disabled {
 .remainingText {
   font-size: 12px;
   font-weight: 400;
-  font-family: "Inter";
+  font-family: "Nunito";
   color: #000000;
   max-width: 150px;
   margin: 1rem;
+}
+.title {
+  color: black;
+  font-size: 36px;
+  font-weight: 400;
+  font-family: "Nunito";
+  padding: 1rem;
+}
+.platformInput {
+  margin: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 18px;
+  font-family: "Nunito";
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+  min-width: 15rem;
+}
+.platformInputHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.selectPlatform {
+  margin: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 12px;
+  font-family: "Nunito";
+  min-width: 15rem;
+}
+.innerContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 15rem;
+}
+.form_wrapper form {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  min-height: 20rem;
+}
+.titleForm {
+  display: flex;
+  flex-direction: row !important;
+}
+.titleForm div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.modalBtn {
+  color: black;
+  font-size: 12px;
+  font-weight: 400;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin: 0.5rem;
+}
+.selection {
+  font-size: 14px;
+  font-family: "Nunito";
+  margin: 0.5rem;
+}
+form div {
+  max-width: 20rem;
 }

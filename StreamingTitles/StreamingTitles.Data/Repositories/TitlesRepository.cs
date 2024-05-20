@@ -267,7 +267,67 @@ public class TitlesRepository : ITitlesRepository
         return await Save();
 
     }
+    public async Task<bool> CreateTitleFromObjectApi(string platformNames, string categoryNames, Title title)
+    {
+        var platforms = platformNames.Split(",");
+        var categories = categoryNames.Split(",");
+        var platformEntities = new List<Platform>();
+        var categoryEntities = new List<Category>();
+        foreach (var platform in platforms)
+        {
+            var platformEntity = await _ctx.Platforms.FirstOrDefaultAsync(p => p.Name == platform);
+            if (platformEntity != null)
+            {
+                platformEntities.Add(platformEntity);
+            }
+            else
+            {
+                var newPlatform = new Platform { Name = platform };
+                _ctx.Platforms.Add(newPlatform);
+                platformEntities.Add(newPlatform);
+            }
+        }
+        foreach (var category in categories)
+        {
+            var categoryEntity = await _ctx.Categories.FirstOrDefaultAsync(c => c.Name == category);
+            if (categoryEntity != null)
+            {
+                categoryEntities.Add(categoryEntity);
+            }
+            else
+            {
+                var newCategory = new Category { Name = category };
+                _ctx.Categories.Add(newCategory);
+                categoryEntities.Add(newCategory);
+            }
+        }
+        await Save();
+        var titlePlatforms = new List<TitlePlatform>();
+        var titleCategories = new List<TitleCategory>();
+        foreach (var platform in platformEntities)
+        {
+            var titlePlatform = new TitlePlatform
+            {
+                Platform = platform,
+                Title = title
+            };
+            titlePlatforms.Add(titlePlatform);
+        }
+        foreach (var category in categoryEntities)
+        {
+            var titleCategory = new TitleCategory
+            {
+                Category = category,
+                Title = title
+            };
+            titleCategories.Add(titleCategory);
+        }
+        _ctx.AddRange(titlePlatforms);
+        _ctx.AddRange(titleCategories);
+        _ctx.Add(title);
+        return await Save();
 
+    }
     public Task<bool> CreateTitle(int platformId, int categoryId, Title title)
     {
         var titlecategoryEntity = _ctx.Categories.FirstOrDefault(c => c.Id == categoryId);
