@@ -36,6 +36,7 @@ builder.Services.AddTransient<TitlesContext>();
 builder.Services.AddTransient<ITitlesRepository, TitlesRepository>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IPlatformRepository, PlatformRepository>();
+builder.Services.AddTransient<ICountryRepository, CountryRepository>();
 
 var app = builder.Build();
 if (args.Length == 1 && args[0].ToLower() == "seeddata")

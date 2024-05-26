@@ -136,6 +136,8 @@ namespace StreamingTitles.Api.Controllers
             }
             var platformNames = titleCreate.platformNames;
             var categoryNames = titleCreate.categoryNames;
+            var countryNames = titleCreate.countryNames;
+
 
             var title = _titlesRepo.GetTitlesAsync()
                 .Result.FirstOrDefault(c => c.TitleName == titleCreate.TitleName.TrimEnd()
@@ -151,7 +153,7 @@ namespace StreamingTitles.Api.Controllers
             }
             var titleMap = _mapper.Map<Title>(titleCreate);
 
-            if (!await _titlesRepo.CreateTitleFromObjectApi(platformNames, categoryNames, titleMap))
+            if (!await _titlesRepo.CreateTitleFromObjectApi(platformNames, categoryNames, countryNames, titleMap))
             {
                 ModelState.AddModelError("", $"Something went wrong saving the title {titleCreate.TitleName}");
                 return StatusCode(500, ModelState);

@@ -22,9 +22,12 @@ namespace StreamingTitles.Data.Model
         public DbSet<Title> Collection { get; set; }
         public DbSet<Platform> Platforms { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Country> Countries { get; set; }
 
         public DbSet<TitleCategory> TitleCategories { get; set; }
         public DbSet<TitlePlatform> TitlePlatform { get; set; }
+        public DbSet<TitleCountry> TitleCountry { get; set; }
+
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -58,6 +61,17 @@ namespace StreamingTitles.Data.Model
                 .HasOne(tp => tp.Platform)
                 .WithMany(p => p.TitlePlatform)
                 .HasForeignKey(tp => tp.PlatformId);
+            // TitleCountry
+            modelBuilder.Entity<TitleCountry>()
+                .HasKey(tc => new { tc.TitleId, tc.CountryId });
+            modelBuilder.Entity<TitleCountry>()
+                .HasOne(tc => tc.Title)
+                .WithMany(t => t.TitleCountry)
+                .HasForeignKey(tc => tc.TitleId);
+            modelBuilder.Entity<TitleCountry>()
+                .HasOne(tc => tc.Country)
+                .WithMany(c => c.TitleCountry)
+                .HasForeignKey(tc => tc.CountryId);
 
         }
     }

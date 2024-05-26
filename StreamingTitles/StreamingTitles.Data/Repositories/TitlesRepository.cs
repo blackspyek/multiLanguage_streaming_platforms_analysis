@@ -59,31 +59,61 @@ public class TitlesRepository : ITitlesRepository
             await _ctx.SaveChangesAsync();
         }
         var allGenres = _ctx.Categories.AsNoTracking().ToList();
-
+        var allCountries = _ctx.Countries.AsNoTracking().ToList();
         var Genres = new ConcurrentDictionary<string, bool>();
-
+        var Countries = new ConcurrentDictionary<string, bool>();
 
         doc.Root.Elements("row").AsParallel().ForAll(row =>
         {
             var listedIn = row.Element("listed_in").Value;
+            var country = row.Element("country").Value;
             var genres = listedIn.Split(',');
+            var countries = country.Split(',');
+
             foreach (var genre in genres)
             {
                 Genres.TryAdd(genre.Trim().ToLower(), true);
             }
+            foreach (var c in countries)
+            {
+                if (string.IsNullOrEmpty(c))
+                {
+                    continue;
+                }
+                Countries.TryAdd(c.Trim().ToLower(), true);
+            }
         });
 
+        var GenresToAdd = new List<Category>();
+        var CountriesToAdd = new List<Country>();
         foreach (var genre in Genres.Keys)
         {
             var temp = genre.Trim().ToLower();
             if (!allGenres.Any(n => n.Name == temp))
             {
                 Category newCategory = new Category { Name = temp };
-                _ctx.Categories.Add(newCategory);
+                GenresToAdd.Add(newCategory);
+
             }
         }
-        _ctx.SaveChanges();
+        _ctx.Categories.AddRange(GenresToAdd);
+
+
+        foreach (var country in Countries.Keys)
+        {
+            var temp = country.Trim().ToLower();
+            if (!allCountries.Any(n => n.Name == temp))
+            {
+                Country newCountry = new Country { Name = temp };
+                CountriesToAdd.Add(newCountry);
+            }
+        }
+
+        _ctx.Countries.AddRange(CountriesToAdd);
+
+        await _ctx.SaveChangesAsync();
         allGenres = _ctx.Categories.AsNoTracking().ToList();
+        allCountries = _ctx.Countries.AsNoTracking().ToList();
         var totalRowCount = doc.Root.Elements("row").Count();
         var rowsProcessed = 0;
         /*
@@ -92,6 +122,7 @@ public class TitlesRepository : ITitlesRepository
          * 
          * 
          */
+        var titlesToInsert = new List<Title>();
         doc.Root.Elements("row").AsParallel().ForAll(async row =>
             {
                 var type = row.Element("type").Value;
@@ -111,12 +142,15 @@ public class TitlesRepository : ITitlesRepository
                         var titleExists = titlesContext.Collection
                             .Include(t => t.TitlePlatform)
                             .Include(t => t.TitleCategory)
+                            .Include(t => t.TitleCountry)
                             .AsNoTracking().FirstOrDefault(
                                 t => t.TitleName == title && t.Release_Year == int.Parse(releaseYear));
 
                         var categoryNames = listedIn.Split(',');
+                        var countryNames = country.Split(',');
                         string temp = "";
                         Category categoryEntity;
+                        Country countryEntity;
 
                         if (titleExists != null)
                         {
@@ -125,6 +159,8 @@ public class TitlesRepository : ITitlesRepository
 
                             if (titleExists.TitleCategory == null)
                                 titleExists.TitleCategory = new List<TitleCategory>();
+                            if (titleExists.TitleCountry == null)
+                                titleExists.TitleCountry = new List<TitleCountry>();
 
                             if (titleExists.TitlePlatform.Any(tp => tp.PlatformId == platform.Id) == false)
                             {
@@ -156,6 +192,22 @@ public class TitlesRepository : ITitlesRepository
 
                             }
 
+                            foreach (var countryName in countryNames)
+                            {
+                                temp = countryName.Trim().ToLower();
+                                countryEntity = allCountries.FirstOrDefault(n => n.Name == temp);
+                                if (titleExists.TitleCountry.Any(tm => tm.CountryId == countryEntity.Id) == false)
+                                {
+                                    TitleCountry titleCountry = new TitleCountry
+                                    {
+                                        CountryId = countryEntity.Id,
+                                        TitleId = titleExists.Id
+                                    };
+                                    titleExists.TitleCountry.Add(titleCountry);
+                                }
+                                titlesContext.Collection.Update(titleExists);
+                            }
+
                             titlesContext.SaveChanges();
                         }
                         else
@@ -164,7 +216,6 @@ public class TitlesRepository : ITitlesRepository
                             {
                                 Type = type,
                                 TitleName = title,
-                                Country = country,
                                 Release_Year = int.Parse(releaseYear)
                             };
 
@@ -178,6 +229,8 @@ public class TitlesRepository : ITitlesRepository
 
                             if (newTitle.TitleCategory == null)
                                 newTitle.TitleCategory = new List<TitleCategory>();
+                            if (newTitle.TitleCountry == null)
+                                newTitle.TitleCountry = new List<TitleCountry>();
 
 
                             foreach (var categoryName in categoryNames)
@@ -192,9 +245,25 @@ public class TitlesRepository : ITitlesRepository
                                 newTitle.TitleCategory.Add(titleCategory);
                             }
 
+                            foreach (var countryName in countryNames)
+                            {
+                                temp = countryName.Trim().ToLower();
+                                countryEntity = allCountries.FirstOrDefault(n => n.Name == temp);
+                                if (countryEntity != null)
+                                {
+                                    TitleCountry titleCountry = new TitleCountry
+                                    {
+                                        CountryId = countryEntity.Id,
+                                        TitleId = newTitle.Id
+                                    };
+                                    newTitle.TitleCountry.Add(titleCountry);
+                                }
+
+                            }
+
                             newTitle.TitlePlatform.Add(titlePlatform);
-                            titlesContext.Collection.Add(newTitle);
-                            titlesContext.SaveChanges();
+                            titlesToInsert.Add(newTitle);
+
 
 
                             Interlocked.Increment(ref rowsProcessed);
@@ -212,6 +281,8 @@ public class TitlesRepository : ITitlesRepository
                 }
 
             });
+        await _ctx.Collection.AddRangeAsync(titlesToInsert);
+        await _ctx.SaveChangesAsync();
         return 1;
 
     }
@@ -267,43 +338,66 @@ public class TitlesRepository : ITitlesRepository
         return await Save();
 
     }
-    public async Task<bool> CreateTitleFromObjectApi(string platformNames, string categoryNames, Title title)
+    public async Task<bool> CreateTitleFromObjectApi(string platformNames, string categoryNames, string countryNames, Title title)
     {
         var platforms = platformNames.Split(",");
         var categories = categoryNames.Split(",");
+        var countries = countryNames.Split(",");
         var platformEntities = new List<Platform>();
         var categoryEntities = new List<Category>();
+        var countryEntities = new List<Country>();
         foreach (var platform in platforms)
         {
-            var platformEntity = await _ctx.Platforms.FirstOrDefaultAsync(p => p.Name == platform);
+            if (platform == null || platform == "") continue;
+            var tempName = platform.Trim().ToLower();
+            var platformEntity = await _ctx.Platforms.FirstOrDefaultAsync(p => p.Name == tempName);
             if (platformEntity != null)
             {
                 platformEntities.Add(platformEntity);
             }
             else
             {
-                var newPlatform = new Platform { Name = platform };
+                var newPlatform = new Platform { Name = tempName };
                 _ctx.Platforms.Add(newPlatform);
                 platformEntities.Add(newPlatform);
             }
         }
         foreach (var category in categories)
         {
-            var categoryEntity = await _ctx.Categories.FirstOrDefaultAsync(c => c.Name == category);
+            if (category == null || category == "") continue;
+            var tempName = category.Trim().ToLower();
+            var categoryEntity = await _ctx.Categories.FirstOrDefaultAsync(c => c.Name == tempName);
             if (categoryEntity != null)
             {
                 categoryEntities.Add(categoryEntity);
             }
             else
             {
-                var newCategory = new Category { Name = category };
+                var newCategory = new Category { Name = tempName };
                 _ctx.Categories.Add(newCategory);
                 categoryEntities.Add(newCategory);
+            }
+        }
+        foreach (var country in countries)
+        {
+            if (country == null || country == "") continue;
+            var tempName = country.Trim().ToLower();
+            var countryEntity = await _ctx.Countries.FirstOrDefaultAsync(c => c.Name == tempName);
+            if (countryEntity != null)
+            {
+                countryEntities.Add(countryEntity);
+            }
+            else
+            {
+                var newCountry = new Country { Name = tempName };
+                _ctx.Countries.Add(newCountry);
+                countryEntities.Add(newCountry);
             }
         }
         await Save();
         var titlePlatforms = new List<TitlePlatform>();
         var titleCategories = new List<TitleCategory>();
+        var titleCountries = new List<TitleCountry>();
         foreach (var platform in platformEntities)
         {
             var titlePlatform = new TitlePlatform
@@ -322,8 +416,18 @@ public class TitlesRepository : ITitlesRepository
             };
             titleCategories.Add(titleCategory);
         }
+        foreach (var country in countryEntities)
+        {
+            var titleCountry = new TitleCountry
+            {
+                Country = country,
+                Title = title
+            };
+            titleCountries.Add(titleCountry);
+        }
         _ctx.AddRange(titlePlatforms);
         _ctx.AddRange(titleCategories);
+        _ctx.AddRange(titleCountries);
         _ctx.Add(title);
         return await Save();
 

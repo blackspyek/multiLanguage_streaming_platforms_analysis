@@ -37,6 +37,24 @@ namespace StreamingTitles.Data.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("StreamingTitles.Data.Model.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Country");
+                });
+
             modelBuilder.Entity("StreamingTitles.Data.Model.Platform", b =>
                 {
                     b.Property<int>("Id")
@@ -57,10 +75,6 @@ namespace StreamingTitles.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<int?>("Release_Year")
                         .IsRequired()
@@ -92,6 +106,21 @@ namespace StreamingTitles.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("TitleCategories");
+                });
+
+            modelBuilder.Entity("StreamingTitles.Data.Model.TitleCountry", b =>
+                {
+                    b.Property<int>("TitleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TitleId", "CountryId");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("TitleCountry");
                 });
 
             modelBuilder.Entity("StreamingTitles.Data.Model.TitlePlatform", b =>
@@ -128,6 +157,25 @@ namespace StreamingTitles.Data.Migrations
                     b.Navigation("Title");
                 });
 
+            modelBuilder.Entity("StreamingTitles.Data.Model.TitleCountry", b =>
+                {
+                    b.HasOne("StreamingTitles.Data.Model.Country", "Country")
+                        .WithMany("TitleCountry")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StreamingTitles.Data.Model.Title", "Title")
+                        .WithMany("TitleCountry")
+                        .HasForeignKey("TitleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+
+                    b.Navigation("Title");
+                });
+
             modelBuilder.Entity("StreamingTitles.Data.Model.TitlePlatform", b =>
                 {
                     b.HasOne("StreamingTitles.Data.Model.Platform", "Platform")
@@ -152,6 +200,11 @@ namespace StreamingTitles.Data.Migrations
                     b.Navigation("TitleCategory");
                 });
 
+            modelBuilder.Entity("StreamingTitles.Data.Model.Country", b =>
+                {
+                    b.Navigation("TitleCountry");
+                });
+
             modelBuilder.Entity("StreamingTitles.Data.Model.Platform", b =>
                 {
                     b.Navigation("TitlePlatform");
@@ -160,6 +213,8 @@ namespace StreamingTitles.Data.Migrations
             modelBuilder.Entity("StreamingTitles.Data.Model.Title", b =>
                 {
                     b.Navigation("TitleCategory");
+
+                    b.Navigation("TitleCountry");
 
                     b.Navigation("TitlePlatform");
                 });

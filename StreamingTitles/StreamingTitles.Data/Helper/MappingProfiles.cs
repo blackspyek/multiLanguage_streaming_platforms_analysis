@@ -23,6 +23,11 @@ namespace StreamingTitles.Data.Helper
             CreateMap<PlatformDTO, Platform>();
             CreateMap<TitlePlatform, TitlePlatformDTO>();
 
+            // Country
+            CreateMap<Country, CountryDTO>();
+            CreateMap<CountryDTO, Country>();
+            CreateMap<TitleCountry, TitleCountryDTO>();
+
         }
     }
 }

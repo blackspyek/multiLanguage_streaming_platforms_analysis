@@ -9,6 +9,7 @@ namespace StreamingTitles.Data.Model
         public int Id { get; set; }
         public ICollection<TitleCategory> TitleCategory { get; set; }
         public ICollection<TitlePlatform> TitlePlatform { get; set; }
+        public ICollection<TitleCountry> TitleCountry { get; set; }
 
         [Required]
         public string Type { get; set; }
@@ -16,7 +17,6 @@ namespace StreamingTitles.Data.Model
         [Required]
         public string TitleName { get; set; }
 
-        public string Country { get; set; }
 
         [Required]
         public int? Release_Year { get; set; }

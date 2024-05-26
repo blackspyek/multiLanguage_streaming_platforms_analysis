@@ -73,6 +73,7 @@ function CategoryModal({ isOpen, onClose, onCategorySelect }) {
           if (newCategory) {
             selectedCategoriesVals += "," + newCategory;
           }
+          selectedCategoriesVals = selectedCategoriesVals.replace(/^,/, "");
           onCategorySelect(selectedCategoriesVals);
         }}
       >

@@ -10,7 +10,6 @@ namespace StreamingTitles.Data.DTO
 
         public string Director { get; set; }
         public string Cast { get; set; }
-        public string Country { get; set; }
 
         public DateTime? Date_Added { get; set; }
 

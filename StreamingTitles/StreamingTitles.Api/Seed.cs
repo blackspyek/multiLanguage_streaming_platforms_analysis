@@ -33,7 +33,6 @@ namespace StreamingTitles.Api
                             },
                             Type = "Movie",
                             TitleName = "The Shawshank Redemption",
-                            Country = "United States",
                             Release_Year = 1994
                         },
                         Category = new Category()
@@ -57,7 +56,6 @@ namespace StreamingTitles.Api
                             },
                             Type = "Movie",
                             TitleName = "The Godfather",
-                            Country = "United States",
                             Release_Year = 1972
                         },
                         Category = new Category()
@@ -116,7 +114,6 @@ namespace StreamingTitles.Api
                     },
                     Type = node["type"].InnerText,
                     TitleName = node["title"].InnerText,
-                    Country = node["country"].InnerText,
                     Release_Year = int.Parse(node["release_year"].InnerText),
                     TitleCategory = titleCategory
                 };

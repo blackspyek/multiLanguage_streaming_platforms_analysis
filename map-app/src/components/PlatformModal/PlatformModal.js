@@ -72,6 +72,7 @@ function PlatformModal({ isOpen, onClose, onCategorySelect }) {
           if (newPlatform) {
             selectedPlatformsVals += "," + newPlatform;
           }
+          selectedPlatformsVals = selectedPlatformsVals.replace(/^,/, "");
           onCategorySelect(selectedPlatformsVals);
         }}
       >

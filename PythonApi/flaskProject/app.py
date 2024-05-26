@@ -4,10 +4,193 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from extensions import db, jwt, validate_database
 from auth import auth
-from models import User, TokenBlocklist
+from models import User, TokenBlocklist, RottenTomatoesMovies
 from users import users
+from rotten_tomatoes_movies import rotten_tomatoes_movies
 from admins import ADMIN_ACCOUNT_USERNAMES_LIST as admin_usernames
 import alembic.config
+from sqlalchemy import create_engine, MetaData, Table, insert
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import select
+import uuid
+from concurrent.futures import ThreadPoolExecutor
+import functools
+import asyncio
+import os
+import datetime
+import csv
+import pandas as pd
+
+async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
+    print(f"Trying to import movies from: {csv_file_path}")
+    start_time = time.time()  # Start timing
+    alembic_cfg = alembic.config.Config('alembic.ini')
+
+    # check if the table exists and is empty
+    engine = create_engine(alembic_cfg.get_main_option('sqlalchemy.url'))
+    metadata = MetaData()
+    movies_table = Table('rotten_tomatoes_movies', metadata, autoload_with=engine)
+    with engine.connect() as conn:
+        #delete_stmt = movies_table.delete()
+        result = conn.execute(select(movies_table)).first()
+        if result is None:
+            print("The table 'rotten_tomatoes_movies' is empty.")
+        else:
+            #conn.execute(delete_stmt)
+            print("The table 'rotten_tomatoes_movies' has been cleared.")
+
+        #conn.commit()
+
+    def parse_date(date_str):
+        try:
+            return datetime.datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else None
+        except ValueError:
+            return None
+
+    if not os.path.isfile(csv_file_path):
+        print(f"File not found: {csv_file_path}")
+        return
+
+    try:
+        with db.session() as query_session:
+            existing_movie_ids = set(row[0] for row in query_session.query(RottenTomatoesMovies.id).all())
+        with open(csv_file_path, newline='', encoding='iso-8859-1') as csvfile:
+            csv_reader = csv.DictReader(csvfile)
+            entries_to_add = []
+            for idx, row in enumerate(csv_reader):
+                rotten_tomatoes_link = row.get('rotten_tomatoes_link')
+                if rotten_tomatoes_link:
+                    rotten_tomatoes_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, rotten_tomatoes_link))
+
+                    # Check if the entry already exist
+                    if rotten_tomatoes_id not in existing_movie_ids:
+                        tomatometer_rating = int(row.get('tomatometer_rating')) if row.get('tomatometer_rating') and row.get('tomatometer_rating').isdigit() else None
+                        tomatometer_count = int(row.get('tomatometer_count')) if row.get('tomatometer_count') and row.get('tomatometer_count').isdigit() else None
+                        audience_rating = int(row.get('audience_rating')) if row.get('audience_rating') and row.get('audience_rating').isdigit() else None
+                        audience_count = int(row.get('audience_count')) if row.get('audience_count') and row.get('audience_count').isdigit() else None
+                        tomatometer_top_critics_count = int(row.get('tomatometer_top_critics_count')) if row.get('tomatometer_top_critics_count') and row.get('tomatometer_top_critics_count').isdigit() else None
+                        tomatometer_fresh_critics_count = int(row.get('tomatometer_fresh_critics_count')) if row.get('tomatometer_fresh_critics_count') and row.get('tomatometer_fresh_critics_count').isdigit() else None
+                        tomatometer_rotten_critics_count = int(row.get('tomatometer_rotten_critics_count')) if row.get('tomatometer_rotten_critics_count') and row.get('tomatometer_rotten_critics_count').isdigit() else None
+
+                        original_release_date = parse_date(row.get('original_release_date'))
+                        streaming_release_date = parse_date(row.get('streaming_release_date'))
+
+                        directors = row.get('directors')
+                        if directors and len(directors) > 255:
+                            directors = directors[:255]
+
+                        authors = row.get('authors')
+                        if authors and len(authors) > 255:
+                            authors = authors[:255]
+
+                        actors = row.get('actors')
+                        if actors and len(actors) > 255:
+                            actors = actors[:255]
+
+                        entries_to_add.append({
+                            'id': rotten_tomatoes_id,
+                            'rotten_tomatoes_link': row.get('rotten_tomatoes_link'),
+                            'movie_title': row.get('movie_title'),
+                            'movie_info': row.get('movie_info'),
+                            'critics_consensus': row.get('critics_consensus'),
+                            'content_rating': row.get('content_rating'),
+                            'genres': row.get('genres'),
+                            'directors': directors,
+                            'authors': authors,
+                            'actors': actors,
+                            'original_release_date': original_release_date,
+                            'streaming_release_date': streaming_release_date,
+                            'runtime': row.get('runtime'),
+                            'production_company': row.get('production_company'),
+                            'tomatometer_status': row.get('tomatometer_status'),
+                            'tomatometer_rating': tomatometer_rating,
+                            'tomatometer_count': tomatometer_count,
+                            'audience_status': row.get('audience_status'),
+                            'audience_rating': audience_rating,
+                            'audience_count': audience_count,
+                            'tomatometer_top_critics_count': tomatometer_top_critics_count,
+                            'tomatometer_fresh_critics_count': tomatometer_fresh_critics_count,
+                            'tomatometer_rotten_critics_count': tomatometer_rotten_critics_count
+                        })
+
+            print(f"Total entries to add: {len(entries_to_add)}")
+            with db.session() as insert_session:
+                if entries_to_add:
+                    try:
+                        insertSQL = insert(movies_table).values(entries_to_add)
+                        insert_session.execute(insertSQL)
+                        insert_session.commit() # Commit the changes to the database
+                        print(f"Added or updated {len(entries_to_add)} entries.")
+
+                    except IntegrityError as e:
+                        print(f"Error during insert/update: {e}")
+                        insert_session.rollback()
+
+    except Exception as e:
+        print(f"Error during CSV import: {e}")
+
+    end_time = time.time()  # End timing
+    print(f"Time taken for import: {end_time - start_time} seconds")
+
+
+def process_chunk(args):
+    chunk, movies_table, db = args  # Unpack arguments
+    entries_to_add = []
+    chunk = chunk.where(pd.notnull(chunk), None).to_dict(orient='records')
+
+    alembic_cfg = alembic.config.Config('alembic.ini')
+    for row in chunk:
+        if not row.get('tconst') or not row.get('originalTitle'):
+            continue
+        row['startYear'] = None if row.get('startYear') == '\\N' else row.get('startYear')
+        entries_to_add.append({
+            'tconst': row.get('tconst'),
+            'original_title': row.get('originalTitle'),
+            'is_adult': row.get('isAdult'),
+            'start_year': row.get('startYear'),
+        })
+    engine = create_engine(alembic_cfg.get_main_option('sqlalchemy.url'))
+    metadata = MetaData()
+    movies_table = Table('title_basics', metadata, autoload_with=engine)
+    with engine.connect() as conn:
+        with conn.begin():
+            conn.execute(movies_table.insert(), entries_to_add)
+            conn.commit()
+            print(f"Added {len(entries_to_add)} entries.")
+async def import_title_basics_from_tsv(tsv_file_path):
+    print(f"Trying to import movies from: {tsv_file_path}")
+    start_time = time.time()  # Start timing
+    alembic_cfg = alembic.config.Config('alembic.ini')
+
+    # check if the table exists and is empty
+    engine = create_engine(alembic_cfg.get_main_option('sqlalchemy.url'))
+    metadata = MetaData()
+    movies_table = Table('title_basics', metadata, autoload_with=engine)
+    with engine.connect() as conn:
+        delete_stmt = movies_table.delete()
+        result = conn.execute(select(movies_table)).first()
+        if result is None:
+            print("The table 'tsv_file_path' is empty.")
+        else:
+            conn.execute(delete_stmt)
+            print("The table 'tsv_file_path' has been cleared.")
+
+        conn.commit()
+
+    if not os.path.isfile(tsv_file_path):
+        print(f"File not found: {tsv_file_path}")
+        return
+    try:
+        chunksize = 10 ** 5
+        with pd.read_csv(tsv_file_path, sep='\t', chunksize=chunksize) as reader:
+            with ThreadPoolExecutor() as executor:
+                executor.map(process_chunk, [(chunk, movies_table, db) for chunk in reader])
+    except Exception as e:
+        print(f"Error during TSV import: {e}")
+
+    end_time = time.time()  # End timing
+    print(f"Time taken for import: {end_time - start_time} seconds")
+
 def create_app():
     validate_database()
     alembic.config.main(argv=['upgrade', 'head'])
@@ -26,6 +209,14 @@ def create_app():
     # Registering the blueprint section
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(users, url_prefix='/users')
+    app.register_blueprint(rotten_tomatoes_movies, url_prefix='/rotten_tomatoes_movies')
+
+
+    with app.app_context():
+        asyncio.run(import_title_basics_from_tsv('./app/title.basics.tsv'))
+    #    asyncio.run(import_rotten_tomatoes_movies_from_csv('./app/rotten_tomatoes_movies.csv'))
+
+
 
     # load user
     @jwt.user_lookup_loader

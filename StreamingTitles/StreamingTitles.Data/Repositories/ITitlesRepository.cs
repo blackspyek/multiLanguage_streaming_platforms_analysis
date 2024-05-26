@@ -19,7 +19,7 @@ namespace StreamingTitles.Data.Repositories
 
         Task<int> TitleExistsAsync(XDocument doc, string platformName);
 
-        Task<bool> CreateTitleFromObjectApi(string platformNames, string categoryNames, Title title);
+        Task<bool> CreateTitleFromObjectApi(string platformNames, string categoryNames, string countryNames, Title title);
 
 
 

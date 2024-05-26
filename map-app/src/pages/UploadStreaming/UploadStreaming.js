@@ -64,9 +64,10 @@ export default function UploadStreaming() {
       categoryNames: selectedCategories,
       type: type,
       titleName: titleName,
-      country: country,
+      countryNames: country,
       release_Year: release_Year,
     };
+    console.log(data);
     try {
       await axios.post("http://localhost:5192/api/titles/titleapi", data);
       toast.success("Record added successfully");
@@ -82,6 +83,7 @@ export default function UploadStreaming() {
   };
   const handleUpload = async (e) => {
     e.preventDefault();
+
     if (!file) return;
 
     const fd = new FormData();
@@ -99,7 +101,7 @@ export default function UploadStreaming() {
       connection.start().then(() => {
         axios
           .post(
-            `http://localhost:5192/api/titles/upload?platformName=${platformName}`,
+            `http://localhost:5192/api/titles/upload?platformName=${platformNameFile}`,
             fd
           )
           .then((res) => {
@@ -249,9 +251,8 @@ export default function UploadStreaming() {
               }`}
               type="text"
               placeholder="Enter Platform"
-              value={platformNameFile}
               onChange={(e) => {
-                setPlatformName(e.target.value);
+                setPlatformNameFile(e.target.value);
               }}
             />
             <label className={classes.custom_file} htmlFor="file">
