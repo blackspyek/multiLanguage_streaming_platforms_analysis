@@ -3,6 +3,7 @@ from sqlite3 import Date
 from extensions import db
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import ForeignKey
 
 
 class User(db.Model):
@@ -106,33 +107,10 @@ class RottenTomatoesMovies(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
-
-
-# imdb_movies
-class titleAkas(db.Model):
-    __tablename__ = 'title_akas'
-    id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-    title_id = db.Column(db.String(255), nullable=False)
-    ordering = db.Column(db.Integer, nullable=True)
-    title = db.Column(db.String(255), nullable=True)
-    region = db.Column(db.String(50), nullable=True)
-    language = db.Column(db.String(50), nullable=True)
-    types = db.Column(db.String(50), nullable=True)
-    attributes = db.Column(db.String(50), nullable=True)
-    is_original_title = db.Column(db.Integer, nullable=True)
-
-    def __repr__(self):
-        return f'<titleAkas {self.title}>'
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-
 class titleBasics(db.Model):
     __tablename__ = 'title_basics'
     tconst = db.Column(db.String(255), nullable=False, primary_key=True)
-    original_title = db.Column(db.String(255), nullable=True)
+    primaryTitle = db.Column(db.Text, nullable=True)
     is_adult = db.Column(db.Boolean, nullable=True)
     start_year = db.Column(db.Integer, nullable=True)
 
@@ -142,7 +120,17 @@ class titleBasics(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+class titleRatings(db.Model):
+    __tablename__ = 'title_ratings'
+    tconst = db.Column(db.String(255), ForeignKey('title_basics.tconst'), nullable=False, primary_key=True)
+    average_rating = db.Column(db.Float, nullable=True)
+    num_votes = db.Column(db.Integer, nullable=True)
 
+    def __repr__(self):
+        return f'<titleRatings {self.tconst}>'
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 class titleCrew(db.Model):
     __tablename__ = 'title_crew'
@@ -158,54 +146,66 @@ class titleCrew(db.Model):
         db.session.add(self)
         db.session.commit()
 
-
-class titlePrincipals(db.Model):
-    __tablename__ = 'title_principals'
-    id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-    tconst = db.Column(db.String(255), nullable=False)
-    ordering = db.Column(db.Integer, nullable=False)
-    nconst = db.Column(db.String(255), nullable=False)
-    category = db.Column(db.String(50), nullable=True)
-    job = db.Column(db.String(50), nullable=True)
-    characters = db.Column(db.String(255), nullable=True)
-
-    def __repr__(self):
-        return f'<titlePrincipals {self.tconst}>'
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
+"""
+    CHECK IF WE WANT IT
+"""
 
 
-class titleRatings(db.Model):
-    __tablename__ = 'title_ratings'
-    id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-    tconst = db.Column(db.String(255), nullable=False)
-    average_rating = db.Column(db.Float, nullable=True)
-    num_votes = db.Column(db.Integer, nullable=True)
+# imdb_movies
+# class titleAkas(db.Model):
+#     __tablename__ = 'title_akas'
+#     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
+#     title_id = db.Column(db.String(255), nullable=False)
+#     ordering = db.Column(db.Integer, nullable=True)
+#     title = db.Column(db.String(255), nullable=True)
+#     region = db.Column(db.String(50), nullable=True)
+#     language = db.Column(db.String(50), nullable=True)
+#     types = db.Column(db.String(50), nullable=True)
+#     attributes = db.Column(db.String(50), nullable=True)
+#     is_original_title = db.Column(db.Integer, nullable=True)
+#
+#     def __repr__(self):
+#         return f'<titleAkas {self.title}>'
+#
+#     def save(self):
+#         db.session.add(self)
+#         db.session.commit()
 
-    def __repr__(self):
-        return f'<titleRatings {self.tconst}>'
+# class titlePrincipals(db.Model):
+#     __tablename__ = 'title_principals'
+#     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
+#     tconst = db.Column(db.String(255), nullable=False)
+#     ordering = db.Column(db.Integer, nullable=False)
+#     nconst = db.Column(db.String(255), nullable=False)
+#     category = db.Column(db.String(50), nullable=True)
+#     job = db.Column(db.String(50), nullable=True)
+#     characters = db.Column(db.String(255), nullable=True)
+#
+#     def __repr__(self):
+#         return f'<titlePrincipals {self.tconst}>'
+#
+#     def save(self):
+#         db.session.add(self)
+#         db.session.commit()
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
+
+
 
 
 # imdb_names
-class nameBasics(db.Model):
-    __tablename__ = 'name_basics'
-    id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-    nconst = db.Column(db.String(255), nullable=False)
-    primary_name = db.Column(db.String(255), nullable=True)
-    birth_year = db.Column(db.Integer, nullable=True)
-    death_year = db.Column(db.Integer, nullable=True)
-    primary_profession = db.Column(db.String(255), nullable=True)
-    known_for_titles = db.Column(db.String(255), nullable=True)
-
-    def __repr__(self):
-        return f'<nameBasics {self.primary_name}>'
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
+# class nameBasics(db.Model):
+#     __tablename__ = 'name_basics'
+#     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
+#     nconst = db.Column(db.String(255), nullable=False)
+#     primary_name = db.Column(db.String(255), nullable=True)
+#     birth_year = db.Column(db.Integer, nullable=True)
+#     death_year = db.Column(db.Integer, nullable=True)
+#     primary_profession = db.Column(db.String(255), nullable=True)
+#     known_for_titles = db.Column(db.String(255), nullable=True)
+#
+#     def __repr__(self):
+#         return f'<nameBasics {self.primary_name}>'
+#
+#     def save(self):
+#         db.session.add(self)
+#         db.session.commit()

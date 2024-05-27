@@ -59,16 +59,10 @@ class titleAkasSchema(Schema):
     is_original_title = fields.Integer(allow_none=True)
 
 class titleBasicsSchema(Schema):
-    id = fields.String()
     tconst = fields.String()
-    titleType = fields.String(allow_none=True)
     primaryTitle = fields.String(allow_none=True)
-    originalTitle = fields.String(allow_none=True)
     isAdult = fields.Integer(allow_none=True)
     startYear = fields.Integer(allow_none=True)
-    endYear = fields.Integer(allow_none=True)
-    runtimeMinutes = fields.Integer(allow_none=True)
-    genres = fields.String(allow_none=True)
 
 class titleCrewSchema(Schema):
     id = fields.String()

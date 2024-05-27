@@ -22,7 +22,6 @@ import csv
 import pandas as pd
 
 async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
-    print(f"Trying to import movies from: {csv_file_path}")
     start_time = time.time()  # Start timing
     alembic_cfg = alembic.config.Config('alembic.ini')
 
@@ -31,15 +30,12 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
     metadata = MetaData()
     movies_table = Table('rotten_tomatoes_movies', metadata, autoload_with=engine)
     with engine.connect() as conn:
-        #delete_stmt = movies_table.delete()
         result = conn.execute(select(movies_table)).first()
         if result is None:
-            print("The table 'rotten_tomatoes_movies' is empty.")
+            print("The table 'rotten_tomatoes_movies' is empty. Seeding the table.")
         else:
-            #conn.execute(delete_stmt)
             print("The table 'rotten_tomatoes_movies' has been cleared.")
 
-        #conn.commit()
 
     def parse_date(date_str):
         try:
@@ -112,15 +108,12 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
                             'tomatometer_fresh_critics_count': tomatometer_fresh_critics_count,
                             'tomatometer_rotten_critics_count': tomatometer_rotten_critics_count
                         })
-
-            print(f"Total entries to add: {len(entries_to_add)}")
             with db.session() as insert_session:
                 if entries_to_add:
                     try:
                         insertSQL = insert(movies_table).values(entries_to_add)
                         insert_session.execute(insertSQL)
                         insert_session.commit() # Commit the changes to the database
-                        print(f"Added or updated {len(entries_to_add)} entries.")
 
                     except IntegrityError as e:
                         print(f"Error during insert/update: {e}")
@@ -131,21 +124,19 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
 
     end_time = time.time()  # End timing
     print(f"Time taken for import: {end_time - start_time} seconds")
-
-
 def process_chunk(args):
     chunk, movies_table, db = args  # Unpack arguments
     entries_to_add = []
     chunk = chunk.where(pd.notnull(chunk), None).to_dict(orient='records')
-
     alembic_cfg = alembic.config.Config('alembic.ini')
     for row in chunk:
-        if not row.get('tconst') or not row.get('originalTitle'):
+        if not row.get('tconst') or not row.get('primaryTitle'):
             continue
         row['startYear'] = None if row.get('startYear') == '\\N' else row.get('startYear')
+        row['isAdult'] = 1 if row.get('isAdult') == '1' else 0
         entries_to_add.append({
             'tconst': row.get('tconst'),
-            'original_title': row.get('originalTitle'),
+            'primaryTitle': row.get('primaryTitle'),
             'is_adult': row.get('isAdult'),
             'start_year': row.get('startYear'),
         })
@@ -154,11 +145,17 @@ def process_chunk(args):
     movies_table = Table('title_basics', metadata, autoload_with=engine)
     with engine.connect() as conn:
         with conn.begin():
-            conn.execute(movies_table.insert(), entries_to_add)
-            conn.commit()
-            print(f"Added {len(entries_to_add)} entries.")
+            try:
+                conn.execute(movies_table.insert(), entries_to_add)
+            except Exception as e:
+                print(f"Error inserting chunk: {e}")
+                for entry in entries_to_add:
+                    try:
+                        conn.execute(movies_table.insert(), [entry])
+                    except Exception as entry_error:
+                        print(f"Error inserting entry: {entry}, Error: {entry_error}")
+
 async def import_title_basics_from_tsv(tsv_file_path):
-    print(f"Trying to import movies from: {tsv_file_path}")
     start_time = time.time()  # Start timing
     alembic_cfg = alembic.config.Config('alembic.ini')
 
@@ -167,21 +164,17 @@ async def import_title_basics_from_tsv(tsv_file_path):
     metadata = MetaData()
     movies_table = Table('title_basics', metadata, autoload_with=engine)
     with engine.connect() as conn:
-        delete_stmt = movies_table.delete()
-        result = conn.execute(select(movies_table)).first()
-        if result is None:
-            print("The table 'tsv_file_path' is empty.")
+        result = conn.execute(select(1).select_from(movies_table).limit(1))  # Check existence
+        if result.scalar() is None:
+            print("The table 'movies_table' is empty. Seeding the table.")
         else:
-            conn.execute(delete_stmt)
-            print("The table 'tsv_file_path' has been cleared.")
-
-        conn.commit()
+            return
 
     if not os.path.isfile(tsv_file_path):
         print(f"File not found: {tsv_file_path}")
         return
     try:
-        chunksize = 10 ** 5
+        chunksize = 20000
         with pd.read_csv(tsv_file_path, sep='\t', chunksize=chunksize) as reader:
             with ThreadPoolExecutor() as executor:
                 executor.map(process_chunk, [(chunk, movies_table, db) for chunk in reader])
@@ -190,6 +183,65 @@ async def import_title_basics_from_tsv(tsv_file_path):
 
     end_time = time.time()  # End timing
     print(f"Time taken for import: {end_time - start_time} seconds")
+
+def process_chunk_ratings(args):
+    chunk, movies_table, db = args  # Unpack arguments
+    entries_to_add = []
+    chunk = chunk.where(pd.notnull(chunk), None).to_dict(orient='records')
+    alembic_cfg = alembic.config.Config('alembic.ini')
+    for row in chunk:
+        if not row.get('tconst') or not row.get('averageRating'):
+            continue
+        row['numVotes'] = None if row.get('numVotes') == '\\N' else row.get('numVotes')
+        entries_to_add.append({
+            'tconst': row.get('tconst'),
+            'average_rating': row.get('averageRating'),
+            'num_votes': row.get('numVotes'),
+        })
+    engine = create_engine(alembic_cfg.get_main_option('sqlalchemy.url'))
+    metadata = MetaData()
+    ratings_table = Table('title_ratings', metadata, autoload_with=engine)
+    with engine.connect() as conn:
+        with conn.begin():
+            try:
+                conn.execute(ratings_table.insert(), entries_to_add)
+            except Exception as e:
+                print(f"Error inserting chunk: {e}")
+                for entry in entries_to_add:
+                    try:
+                        conn.execute(ratings_table.insert(), [entry])
+                    except Exception as entry_error:
+                        print(f"Error inserting entry: {entry}, Error: {entry_error}")
+async def import_title_ratings_from_tsv(tsv_file_path):
+    start_time = time.time()  # Start timing
+    alembic_cfg = alembic.config.Config('alembic.ini')
+
+    # check if the table exists and is empty
+    engine = create_engine(alembic_cfg.get_main_option('sqlalchemy.url'))
+    metadata = MetaData()
+    movies_ratings = Table('title_ratings', metadata, autoload_with=engine)
+    with engine.connect() as conn:
+        result = conn.execute(select(1).select_from(movies_ratings).limit(1))  # Check existence
+        if result.scalar() is None:
+            print("The table 'movies_table' is empty. Seeding the table.")
+        else:
+            return
+    if not os.path.isfile(tsv_file_path):
+        print(f"File not found: {tsv_file_path}")
+        return
+    try:
+        chunksize = 5000
+        with pd.read_csv(tsv_file_path, sep='\t', chunksize=chunksize) as reader:
+            with ThreadPoolExecutor() as executor:
+                executor.map(process_chunk_ratings, [(chunk, movies_ratings, db) for chunk in reader])
+    except Exception as e:
+        print(f"Error during TSV import: {e}")
+
+    end_time = time.time()  # End timing
+    print(f"Time taken for import: {end_time - start_time} seconds")
+
+
+
 
 def create_app():
     validate_database()
@@ -214,7 +266,8 @@ def create_app():
 
     with app.app_context():
         asyncio.run(import_title_basics_from_tsv('./app/title.basics.tsv'))
-    #    asyncio.run(import_rotten_tomatoes_movies_from_csv('./app/rotten_tomatoes_movies.csv'))
+        asyncio.run(import_rotten_tomatoes_movies_from_csv('./app/rotten_tomatoes_movies.csv'))
+        asyncio.run(import_title_ratings_from_tsv('./app/title.ratings.tsv'))
 
 
 

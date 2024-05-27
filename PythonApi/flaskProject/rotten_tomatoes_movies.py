@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from models import RottenTomatoesMovies
-from schemas import RottenTomatoesMoviesSchema
+from models import RottenTomatoesMovies, titleBasics
+from schemas import RottenTomatoesMoviesSchema, titleBasicsSchema
 from flask_jwt_extended import jwt_required, get_jwt
 
 rotten_tomatoes_movies = Blueprint('rotten_tomatoes_movies', __name__)
