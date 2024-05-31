@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StreamingTitles.Data.DTO;
 using StreamingTitles.Data.Model;
 
 namespace StreamingTitles.Data.Repositories
@@ -47,7 +48,25 @@ namespace StreamingTitles.Data.Repositories
             _ctx.Add(country);
             return Save();
         }
-
+        public async Task<Dictionary<string, List<TitleDTO>>> GetAllCountriesTitles()
+        {
+            var titlesByCountry = await _ctx.TitleCountry
+                .Include(tc => tc.Title)
+                .Include(tc => tc.Country)
+                .GroupBy(tc => tc.Country.Name)
+                .AsNoTracking()
+                .ToDictionaryAsync(
+                    g => g.Key,
+                    g => g.Select(tc => new TitleDTO
+                    {
+                        Id = tc.Title.Id,
+                        TitleName = tc.Title.TitleName,
+                        Type = tc.Title.Type,
+                        Release_Year = tc.Title.Release_Year,
+                    }).ToList()
+            );
+            return titlesByCountry;
+        }
         public async Task<bool> DeleteCountry(Country country)
         {
             _ctx.Countries.Remove(country);

@@ -2,11 +2,13 @@ import time
 
 from flask import Flask, jsonify
 from flask_cors import CORS
-from extensions import db, jwt, validate_database
+from extensions import db, jwt, validate_database, create_join_table
 from auth import auth
 from models import User, TokenBlocklist, RottenTomatoesMovies
 from users import users
 from rotten_tomatoes_movies import rotten_tomatoes_movies
+from controllers.imdbController import imdb
+from controllers.mapController import _map
 from admins import ADMIN_ACCOUNT_USERNAMES_LIST as admin_usernames
 import alembic.config
 from sqlalchemy import create_engine, MetaData, Table, insert
@@ -20,7 +22,7 @@ import os
 import datetime
 import csv
 import pandas as pd
-
+from matchRating import save_match_rating
 async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
     start_time = time.time()  # Start timing
     alembic_cfg = alembic.config.Config('alembic.ini')
@@ -136,6 +138,7 @@ def process_chunk(args):
         row['isAdult'] = 1 if row.get('isAdult') == '1' else 0
         entries_to_add.append({
             'tconst': row.get('tconst'),
+            'originalTitle': row.get('originalTitle'),
             'primaryTitle': row.get('primaryTitle'),
             'is_adult': row.get('isAdult'),
             'start_year': row.get('startYear'),
@@ -242,14 +245,14 @@ async def import_title_ratings_from_tsv(tsv_file_path):
 
 
 
+from time import sleep
+from werkzeug.serving import is_running_from_reloader
 
 def create_app():
-    validate_database()
-    alembic.config.main(argv=['upgrade', 'head'])
 
-
+    corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://localhost:3000')
     app = Flask(__name__)
-    CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
+    CORS(app, supports_credentials=True, origins=[corsOriginsURL])
 
     app.config.from_prefixed_env()
 
@@ -261,13 +264,22 @@ def create_app():
     # Registering the blueprint section
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(users, url_prefix='/users')
-    app.register_blueprint(rotten_tomatoes_movies, url_prefix='/rotten_tomatoes_movies')
+    app.register_blueprint(rotten_tomatoes_movies, url_prefix='/rotten')
+    app.register_blueprint(imdb, url_prefix='/imdb')
+    app.register_blueprint(_map, url_prefix='/map')
 
 
     with app.app_context():
-        asyncio.run(import_title_basics_from_tsv('./app/title.basics.tsv'))
-        asyncio.run(import_rotten_tomatoes_movies_from_csv('./app/rotten_tomatoes_movies.csv'))
-        asyncio.run(import_title_ratings_from_tsv('./app/title.ratings.tsv'))
+        if not is_running_from_reloader():
+            validate_database()
+            alembic.config.main(argv=['upgrade', 'head'])
+            asyncio.run(import_rotten_tomatoes_movies_from_csv('data/rotten_tomatoes_movies.csv'))
+            asyncio.run(import_title_basics_from_tsv('data/title.basics.tsv'))
+            asyncio.run(import_title_ratings_from_tsv('data/title.ratings.tsv'))
+            asyncio.run(create_join_table())
+            save_match_rating()
+
+
 
 
 

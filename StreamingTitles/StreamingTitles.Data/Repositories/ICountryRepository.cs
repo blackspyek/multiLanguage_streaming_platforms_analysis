@@ -1,4 +1,5 @@
-﻿using StreamingTitles.Data.Model;
+﻿using StreamingTitles.Data.DTO;
+using StreamingTitles.Data.Model;
 
 namespace StreamingTitles.Data.Repositories
 {
@@ -15,5 +16,6 @@ namespace StreamingTitles.Data.Repositories
         Task<bool> Save();
         Task<bool> CountryExists(int countryid);
         Task<bool> CountryTitleExists(int testCountryId, int testTitleId);
+        Task<Dictionary<string, List<TitleDTO>>> GetAllCountriesTitles();
     }
 }

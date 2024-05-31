@@ -6,7 +6,6 @@
         public string Type { get; set; }
         public string TitleName { get; set; }
 
-
         public int? Release_Year { get; set; }
 
 

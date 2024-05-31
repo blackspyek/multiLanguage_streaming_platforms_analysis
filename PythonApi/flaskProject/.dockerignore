@@ -1,0 +1,6 @@
+
+# Exclude data folder
+data
+data/
+.venv/
+*.log

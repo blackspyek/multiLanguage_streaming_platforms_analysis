@@ -90,6 +90,32 @@ namespace StreamingTitles.Api.Controllers
             return Ok(titles);
         }
 
+        [HttpGet("all/movies")]
+        [ProducesResponseType(typeof(Dictionary<string, List<TitleDTO>>), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> GetCountryWithTitles()
+        {
+            try
+            {
+                var titlesByCountry = await _countryRepository.GetAllCountriesTitles();
+
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                return Ok(titlesByCountry);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(new
+                {
+                    StatusCode = 500,
+                    message = ex.Message
+                });
+            }
+
+        }
+
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

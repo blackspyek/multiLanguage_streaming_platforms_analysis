@@ -95,3 +95,11 @@ class nameBasicsSchema(Schema):
     deathYear = fields.Integer(allow_none=True) # in YYYY format if applicable, else '\N'
     primaryProfession = fields.String(allow_none=True) # the top-3 professions of the person
     knownForTitles = fields.String(allow_none=True) # titles the person is known for
+
+class titleBasicsRatingSchema(Schema):
+    tconst = fields.String()
+    primaryTitle = fields.String(allow_none=True)
+    isAdult = fields.Integer(allow_none=True)
+    startYear = fields.Integer(allow_none=True)
+    averageRating = fields.Float(allow_none=True)
+    numVotes = fields.Integer(allow_none=True)

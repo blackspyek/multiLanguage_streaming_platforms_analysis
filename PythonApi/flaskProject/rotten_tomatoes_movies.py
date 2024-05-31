@@ -1,45 +1,40 @@
 from flask import Blueprint, jsonify, request
 from models import RottenTomatoesMovies, titleBasics
 from schemas import RottenTomatoesMoviesSchema, titleBasicsSchema
+from extensions import db
 from flask_jwt_extended import jwt_required, get_jwt
 
 rotten_tomatoes_movies = Blueprint('rotten_tomatoes_movies', __name__)
 
+def get_years_func():
+    result = db.session.query(
+        db.func.year(RottenTomatoesMovies.original_release_date).label("release_year"),
+        db.func.avg(RottenTomatoesMovies.tomatometer_rating).label("avg_tomatometer_rating"),
+        db.func.avg(RottenTomatoesMovies.audience_rating).label("avg_audience_rating"),
+    ).group_by("release_year").all()
+    data = []
+    for row in result:
+        if row.release_year is None:
+            continue
+        data.append({
+            "release_year": row.release_year,
+            "avg_tomatometer_rating": float(row.avg_tomatometer_rating/10),
+            "avg_audience_rating": float(row.avg_audience_rating/10)
+        })
+    data.sort(key=lambda x: x['release_year'])
+    return data
+
 
 @rotten_tomatoes_movies.route('/all')
-# @jwt_required()  # Ensure the endpoint is protected by JWT
+@jwt_required()
 def get_rotten_tomatoes_movies():
-    # Extract the claims from the JWT token
-    # claims = get_jwt()
-    # Check if the role in the claims is not 'admin'
-    # if claims['role'] != 'admin':
-    #     return jsonify({'message': 'You are not authorized to access this resource'}), 403
+    claims = get_jwt()
+    if claims['role'] != 'admin':
+        return jsonify({'message': 'You are not authorized to access this resource'}), 403
 
-    # Get pagination parameters from the request
-    page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=10, type=int)
+    try:
+        data = get_years_func()
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({'message': 'An error occurred while processing your request', 'error': str(e)}), 500
 
-    # Paginate the rotten_tomatoes_movies entries
-    rotten_tomatoes_movies_pagination = RottenTomatoesMovies.query.paginate(
-        per_page=per_page,
-        page=page,
-        error_out=True
-    )
-
-    # Get the items from the pagination object
-    rotten_tomatoes_movies_entries = rotten_tomatoes_movies_pagination.items
-
-    # Serialize the rotten_tomatoes_movies entries using RottenTomatoesMoviesSchema
-    result = RottenTomatoesMoviesSchema().dump(rotten_tomatoes_movies_entries, many=True)
-
-    # Prepare the response with pagination metadata
-    response = {
-        "rotten_tomatoes_movies": result,
-        "total": rotten_tomatoes_movies_pagination.total,
-        "page": rotten_tomatoes_movies_pagination.page,
-        "per_page": rotten_tomatoes_movies_pagination.per_page,
-        "pages": rotten_tomatoes_movies_pagination.pages
-    }
-
-    # Return the response as a JSON object
-    return jsonify(response), 200

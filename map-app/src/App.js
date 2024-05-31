@@ -12,6 +12,7 @@ import Admin from "./components/Admin";
 import PersistLogin from "./components/PersistLogin";
 import Home from "./pages/Home/HomePage";
 import UploadStreaming from "./pages/UploadStreaming/UploadStreaming";
+import Graphs from "./pages/Graphs/GraphsPage";
 const ROLES = {
   ADMIN: "admin",
   USER: "user",
@@ -28,6 +29,7 @@ function App() {
         <Route path="unauthorized" element={<Unauthorized />} />
         <Route element={<PersistLogin />}>
           <Route path="/" element={<Home />} />
+          <Route path="graphs" element={<Graphs />} />
 
           {/* private routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>

@@ -4,8 +4,9 @@ from extensions import db
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 
-
+Base = declarative_base()
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
@@ -26,6 +27,9 @@ class User(db.Model):
     def get_user_by_username(cls, username):
         return User.query.filter_by(username=username).first()
 
+    @classmethod
+    def check_if_user_exists(cls, username, email):
+        return User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first()
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -43,31 +47,6 @@ class TokenBlocklist(db.Model):
 
     def __repr__(self):
         return f'<Token {self.jti}>'
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-
-# netflix
-class Netflix(db.Model):
-    __tablename__ = 'netflix'
-    id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-    show_id = db.Column(db.String(255), nullable=False)
-    type = db.Column(db.String(50), nullable=False)
-    title = db.Column(db.String(255), nullable=False)
-    director = db.Column(db.String(255), nullable=True)
-    cast = db.Column(db.Text, nullable=True)
-    country = db.Column(db.String(255), nullable=True)
-    date_added = db.Column(db.String(255), nullable=True)
-    release_year = db.Column(db.Integer, nullable=True)
-    rating = db.Column(db.String(10), nullable=True)
-    duration = db.Column(db.String(50), nullable=True)
-    listed_in = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.Text, nullable=True)
-
-    def __repr__(self):
-        return f'<Netflix {self.title}>'
 
     def save(self):
         db.session.add(self)
@@ -110,12 +89,13 @@ class RottenTomatoesMovies(db.Model):
 class titleBasics(db.Model):
     __tablename__ = 'title_basics'
     tconst = db.Column(db.String(255), nullable=False, primary_key=True)
+    originalTitle = db.Column(db.Text, nullable=True)
     primaryTitle = db.Column(db.Text, nullable=True)
     is_adult = db.Column(db.Boolean, nullable=True)
     start_year = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
-        return f'<titleBasics {self.primary_title}>'
+        return f'<titleBasics {self.primaryTitle}>'
 
     def save(self):
         db.session.add(self)
@@ -145,7 +125,22 @@ class titleCrew(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+class TitleJoined(Base):
+    __tablename__ = 'title_joined'
+    tconst = db.Column(db.String(255), primary_key=True)
+    originalTitle = db.Column(db.Text, nullable=True)
+    primaryTitle = db.Column(db.Text, nullable=True)
+    is_adult = db.Column(db.Boolean, nullable=True)
+    start_year = db.Column(db.Integer, nullable=True)
+    average_rating = db.Column(db.Float, nullable=True)
+    num_votes = db.Column(db.Integer, nullable=True)
 
+    def __repr__(self):
+        return f'<TitleJoined {self.primaryTitle}>'
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 """
     CHECK IF WE WANT IT
 """

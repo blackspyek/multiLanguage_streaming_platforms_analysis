@@ -412,6 +412,35 @@
     ]
   },
   {
+    "ContainingType": "StreamingTitles.Api.Controllers.CountryController",
+    "Method": "GetCountryWithTitles",
+    "RelativePath": "api/country/all/movies",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.Dictionary\u00602[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List\u00601[[StreamingTitles.Data.DTO.TitleDTO, StreamingTitles.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
     "ContainingType": "StreamingTitles.Api.Controllers.PlatformController",
     "Method": "GetPlatforms",
     "RelativePath": "api/platform",
