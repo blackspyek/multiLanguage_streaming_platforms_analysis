@@ -1,3 +1,4 @@
+import json
 import os
 
 from flask import Blueprint, jsonify, request
@@ -20,12 +21,11 @@ def get_year_with_titles_func():
         print(err)
 
 @_map.route('/all')
-@jwt_required()
 def get_year_with_titles():
-    claims = get_jwt()
-    if claims['role'] != 'admin':
-        return jsonify({'message': 'You are not authorized to access this resource'}), 403
-
+    if redis_client.get('country_avg_rating') is not None:
+        country_avg_rating = redis_client.get('country_avg_rating')
+        country_avg_rating = country_avg_rating.decode('utf-8')
+        return jsonify(json.loads(country_avg_rating)), 200
     data = get_year_with_titles_func()
     if not data:
         return jsonify({'message': 'No data found'}), 404
@@ -56,7 +56,10 @@ def get_year_with_titles():
                 titles_that_dont_exist.append("Title: " + title['titleName'] + " Year: " + str(title['release_Year']))
         if count > 0:
             country_avg_rating[country] = total_rating / count
+    redis_client.set('country_avg_rating', json.dumps(country_avg_rating))
+
     country_avg_rating['titles_that_dont_exist'] = titles_that_dont_exist
+
     return jsonify(country_avg_rating), 200
 
 
