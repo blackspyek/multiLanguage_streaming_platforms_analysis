@@ -8,6 +8,7 @@
 3. (Only for .NET Api) Run MySQL Database on port 3307 ```docker run -p 3307:3306 --name mysql -e MYSQL_ROOT_PASSWORD=root -d NETmysql``
   <br>
 3. Have node.js and npm installed
+4. (Optional) Purified Data (minimal) https://drive.google.com/file/d/11FdsNBOIv1zK8cu_DcG1WWdnJkRw1Ycz/view?usp=sharing
 </details>
 
 <details>
