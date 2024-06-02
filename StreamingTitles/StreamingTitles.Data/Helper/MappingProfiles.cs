@@ -28,6 +28,12 @@ namespace StreamingTitles.Data.Helper
             CreateMap<CountryDTO, Country>();
             CreateMap<TitleCountry, TitleCountryDTO>();
 
+            // FullTitleInfo
+            CreateMap<Title, FullTitleInfoDTO>()
+                .ForMember(dest => dest.TitleCategory, opt => opt.MapFrom(src => src.TitleCategory))
+                .ForMember(dest => dest.TitlePlatform, opt => opt.MapFrom(src => src.TitlePlatform))
+                .ForMember(dest => dest.TitleCountry, opt => opt.MapFrom(src => src.TitleCountry));
+
         }
     }
 }

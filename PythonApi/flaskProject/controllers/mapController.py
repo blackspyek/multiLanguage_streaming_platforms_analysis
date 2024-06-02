@@ -22,7 +22,11 @@ def get_year_with_titles_func():
 
 @_map.route('/all')
 def get_year_with_titles():
-    if redis_client.get('country_avg_rating') is not None:
+    lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
+    lastmodDate = requests.get(lastmodDateURL).json()
+    lastSaved = redis_client.get('titles_with_ratings_lastmod')
+    lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
+    if redis_client.get('country_avg_rating') is not None or lastSaved == lastmodDate:
         country_avg_rating = redis_client.get('country_avg_rating')
         country_avg_rating = country_avg_rating.decode('utf-8')
         return jsonify(json.loads(country_avg_rating)), 200
@@ -42,8 +46,21 @@ def get_year_with_titles():
                 title['titleName'].replace(",", ":"),
 
             ]
+            year_variations = [
+                title['release_Year'] - 1,
+                title['release_Year'] - 2,
+                title['release_Year'] - 3,
+                title['release_Year'] - 4,
+                title['release_Year'] - 5,
+                title['release_Year'],
+                title['release_Year'] + 1,
+                title['release_Year'] + 2,
+                title['release_Year'] + 3,
+                title['release_Year'] + 4,
+                title['release_Year'] + 5
+            ]
             query = session.query(TitleJoined).filter(
-                TitleJoined.start_year.in_([title['release_Year'] - 1, title['release_Year'],title['release_Year'] + 1]),
+                TitleJoined.start_year.in_(year_variations),
                 or_(
                     (TitleJoined.primaryTitle.in_(title_variations)),
                     (TitleJoined.originalTitle.in_(title_variations))

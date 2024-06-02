@@ -11,8 +11,9 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  RadialLinearScale,
 } from "chart.js";
-import { Chart, Line } from "react-chartjs-2";
+import { Chart, Line, PolarArea } from "react-chartjs-2";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
@@ -30,6 +31,9 @@ function Graphs() {
   const [rottenTomatometerRating, setRottenTomatometerRating] = useState([]);
   const [yearRange, setYearRange] = useState([2000, 2024]);
 
+  const [BestMovieDirectors, setBestMovieDirectors] = useState([]);
+  const [type, setType] = useState("movie");
+
   ChartJS.register(
     ArcElement,
     Tooltip,
@@ -37,7 +41,8 @@ function Graphs() {
     CategoryScale,
     LinearScale,
     PointElement,
-    LineElement
+    LineElement,
+    RadialLinearScale
   );
 
   useEffect(() => {
@@ -78,6 +83,33 @@ function Graphs() {
       controller.abort();
     };
   }, [axiosPrivate, years]);
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const getBestMovieDirectors = async () => {
+      try {
+        const response = await axiosPrivate.get("/directors/all", {
+          signal: controller.signal,
+          params: {
+            type,
+          },
+        });
+        if (isMounted) {
+          setBestMovieDirectors(response.data);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getBestMovieDirectors();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [axiosPrivate, type]);
 
   useEffect(() => {
     let isMounted = true;
@@ -184,6 +216,48 @@ function Graphs() {
                 ],
               }}
             />
+          </div>
+          <div>
+            <h1>Best directors</h1>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className={classes.select}
+            >
+              <option value="movie">Movie</option>
+              <option value="tvSeries">TV Show</option>
+            </select>
+            <div>
+              <PolarArea
+                datasetIdKey="bestDirectors"
+                options={{
+                  maintainAspectRatio: false,
+                  radius: 1,
+                  hoverRadius: 10,
+                }}
+                data={{
+                  labels: BestMovieDirectors.map(
+                    (director) => director.director_name
+                  ),
+                  datasets: [
+                    {
+                      id: 1,
+                      label: "Weighted Average",
+                      data: BestMovieDirectors.map(
+                        (director) => director.weighted_average
+                      ),
+                      backgroundColor: [
+                        "rgba(255, 99, 132, 0.5)",
+                        "rgba(54, 162, 235, 0.5)",
+                        "rgba(255, 206, 86, 0.5)",
+                        "rgba(75, 192, 192, 0.5)",
+                        "rgba(153, 102, 255, 0.5)",
+                      ],
+                    },
+                  ],
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

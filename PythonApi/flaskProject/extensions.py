@@ -2,11 +2,14 @@ import os
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-from sqlalchemy import create_engine, inspect, text
+from sqlalchemy import create_engine, inspect, text, extract
 from sqlalchemy_utils import database_exists, create_database
 from alembic.config import Config
 import redis
+import requests
 # Database manager
+from time import time
+
 db = SQLAlchemy()
 session = db.session
 def validate_database():
@@ -15,18 +18,6 @@ def validate_database():
     engine = create_engine(db.engine.url)
     if not database_exists(engine.url):
         create_database(engine.url)
-
-
-# JWT manager
-jwt = JWTManager()
-
-REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-REDIS_PORT = os.getenv('REDIS_PORT', 6379)
-REDIS_DB = os.getenv('REDIS_DB', 0)
-
-# Redis manager
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
-
 
 async def create_join_table():
     print("Creating join table")
@@ -44,6 +35,7 @@ async def create_join_table():
         CREATE TABLE title_joined AS
         SELECT
             tb.tconst,
+            tb.titleType,
             tb.originalTitle,
             tb.primaryTitle,
             tb.is_adult,
@@ -62,17 +54,26 @@ async def create_join_table():
     create_index2 = """
         CREATE INDEX idx_titlejoined_original_title_start_year ON title_joined (originalTitle(255), start_year);
     """
+
     with engine.connect() as connection:
         connection.execute(text(create_table))
         connection.execute(text(create_index1))
         connection.execute(text(create_index2))
 
+    print("Table created successfully")
+
+# JWT manager
+jwt = JWTManager()
+
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+REDIS_DB = os.getenv('REDIS_DB', 0)
+
+# Redis manager
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 
 
-
-
-    print("Join table created")
 
 
 

@@ -58,7 +58,7 @@ const MapChart = () => {
   return (
     <ComposableMap
       projectionConfig={{
-        scale: 220,
+        scale: 160,
       }}
     >
       <Geographies geography={geoUrl}>

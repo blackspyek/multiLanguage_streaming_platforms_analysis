@@ -1,6 +1,7 @@
 
 using Asp.Versioning;
 using StreamingTitles.Api;
+using StreamingTitles.Data.Helper;
 using StreamingTitles.Data.Model;
 using StreamingTitles.Data.Repositories;
 
@@ -32,11 +33,15 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "StreamingTitles.Api", Version = "v1" });
 });
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<ILastModificationService, LastModificationService>();
+
 builder.Services.AddTransient<TitlesContext>();
 builder.Services.AddTransient<ITitlesRepository, TitlesRepository>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IPlatformRepository, PlatformRepository>();
 builder.Services.AddTransient<ICountryRepository, CountryRepository>();
+
+
 
 var app = builder.Build();
 if (args.Length == 1 && args[0].ToLower() == "seeddata")

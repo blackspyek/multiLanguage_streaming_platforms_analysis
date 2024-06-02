@@ -38,9 +38,6 @@ nav a {
   height: 80vh;
 }
 
-.svgWrapper svg {
-  max-height: 100vh;
-}
 .svgWrapper {
   background-color: #1e90ff;
 }

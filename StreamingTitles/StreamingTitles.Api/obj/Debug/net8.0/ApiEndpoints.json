@@ -836,6 +836,26 @@
   },
   {
     "ContainingType": "StreamingTitles.Api.Controllers.TitlesController",
+    "Method": "GetLastModified",
+    "RelativePath": "api/titles/lastmod",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.DateTime",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "StreamingTitles.Api.Controllers.TitlesController",
     "Method": "CreateTitleFromApi",
     "RelativePath": "api/titles/titleapi",
     "HttpMethod": "POST",

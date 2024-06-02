@@ -1,0 +1,130 @@
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  flex-direction: column;
+  align-items: center;
+}
+.title {
+  text-decoration: none;
+  color: #000000;
+  font-family: "Inter";
+  font-size: 32px;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+th {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 1px solid #000000;
+  padding: 0 2rem 0.5rem 2rem;
+  width: 200px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter";
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+td {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  padding: 0 2rem 0.5rem 2rem;
+  width: 200px;
+}
+
+table tr:nth-child(2n) {
+  background-color: #dedddd;
+}
+tr {
+  padding: 2rem;
+}
+tbody tr td {
+  padding: 1rem;
+}
+
+table td:last-child {
+  font-weight: 700;
+}
+.yearSelection {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+  width: 20%;
+}
+.filterButton {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+select {
+  padding: 0.5rem;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 5px;
+  border: 1px solid #000000;
+  margin-top: 1rem;
+}
+.sortable {
+  cursor: pointer;
+}
+.sortedBy {
+  color: #000000;
+  font-weight: 700;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+.genreSelection {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 2rem;
+}
+.genre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter";
+  font-size: 14px;
+}
+.genreCheckbox {
+  display: none;
+}
+.selected {
+  color: rgb(4, 61, 118);
+  font-weight: bold;
+}
+.downloadButton {
+  position: absolute;
+  z-index: 1;
+  bottom: -4rem;
+  right: 2rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  background-color: white;
+  color: black;
+  font-family: "Inter";
+  border-radius: 5px;
+}
+.tableHandle {
+  position: relative;
+}

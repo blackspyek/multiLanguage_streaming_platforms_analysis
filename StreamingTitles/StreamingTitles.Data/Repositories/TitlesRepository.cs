@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using StreamingTitles.Data.Helper;
 using StreamingTitles.Data.Model;
 using System.Collections.Concurrent;
 using System.Xml.Linq;
@@ -12,12 +13,14 @@ public class TitlesRepository : ITitlesRepository
     private readonly IMapper _mapper;
     private readonly IPlatformRepository _platformRepository;
     private readonly IHubContext<ProgressHub> _hubContext;
-    public TitlesRepository(TitlesContext ctx, IMapper mapper, IPlatformRepository platformRepository, IHubContext<ProgressHub> hubContext)
+    private readonly ILastModificationService _lastModificationService;
+    public TitlesRepository(TitlesContext ctx, IMapper mapper, IPlatformRepository platformRepository, IHubContext<ProgressHub> hubContext, ILastModificationService lastMod)
     {
         _ctx = ctx;
         _mapper = mapper;
         _platformRepository = platformRepository;
         _hubContext = hubContext = hubContext;
+        _lastModificationService = lastMod;
     }
     public async Task<IEnumerable<Title>> GetTitlesByReleaseYearRangeAsync(List<string> genreNames, List<string> platformNames, int startYear = 0, int endYear = 0)
     {
@@ -35,6 +38,8 @@ public class TitlesRepository : ITitlesRepository
             .ThenInclude(tc => tc.Category)
             .Include(t => t.TitlePlatform)
             .ThenInclude(tp => tp.Platform)
+            .Include(t => t.TitleCountry)
+            .ThenInclude(tc => tc.Country)
             .Where(t => t.Release_Year >= startYear && t.Release_Year <= endYear);
 
         if (genreNames != null && genreNames.Any())
@@ -46,6 +51,7 @@ public class TitlesRepository : ITitlesRepository
             query = query.Where(t => t.TitlePlatform.Any(tc => platformNames.Contains(tc.Platform.Name)));
         }
         var titles = await query.Distinct().ToListAsync();
+
         return titles;
     }
 
@@ -281,6 +287,7 @@ public class TitlesRepository : ITitlesRepository
                 }
 
             });
+        _lastModificationService.LastModified = DateTime.UtcNow;
         await _ctx.Collection.AddRangeAsync(titlesToInsert);
         await _ctx.SaveChangesAsync();
         return 1;
@@ -335,6 +342,7 @@ public class TitlesRepository : ITitlesRepository
         _ctx.AddRange(categories);
         _ctx.AddRange(platforms);
         _ctx.AddRange(title);
+        _lastModificationService.LastModified = DateTime.UtcNow;
         return await Save();
 
     }
@@ -429,6 +437,7 @@ public class TitlesRepository : ITitlesRepository
         _ctx.AddRange(titleCategories);
         _ctx.AddRange(titleCountries);
         _ctx.Add(title);
+        _lastModificationService.LastModified = DateTime.UtcNow;
         return await Save();
 
     }
@@ -451,6 +460,7 @@ public class TitlesRepository : ITitlesRepository
         };
         _ctx.Add(titleplatform);
         _ctx.Add(title);
+        _lastModificationService.LastModified = DateTime.UtcNow;
         return Save();
     }
 
@@ -481,6 +491,7 @@ public class TitlesRepository : ITitlesRepository
         _ctx.TitleCategories.Remove(titlecategoryEntity);
         _ctx.TitlePlatform.Remove(titleplatformEntity);
         _ctx.Remove(title);
+        _lastModificationService.LastModified = DateTime.UtcNow;
         return await Save();
     }
 

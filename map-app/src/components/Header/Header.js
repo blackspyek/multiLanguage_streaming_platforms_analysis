@@ -14,8 +14,12 @@ export default function Header() {
           <>
             {auth?.role === "admin" && <Link to="/admin">Admin</Link>}
             {auth?.role === "admin" && (
-              <Link to="/uploadstream">Streaming</Link>
+              <>
+                <Link to="/uploadstream">Streaming</Link>
+              </>
             )}
+            <Link to="/graphs">Graphs</Link>
+            <Link to="/catalog">Catalog</Link>
             <Logout />
           </>
         ) : (

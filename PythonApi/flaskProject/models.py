@@ -89,6 +89,7 @@ class RottenTomatoesMovies(db.Model):
 class titleBasics(db.Model):
     __tablename__ = 'title_basics'
     tconst = db.Column(db.String(255), nullable=False, primary_key=True)
+    titleType = db.Column(db.String(100), nullable=True)
     originalTitle = db.Column(db.Text, nullable=True)
     primaryTitle = db.Column(db.Text, nullable=True)
     is_adult = db.Column(db.Boolean, nullable=True)
@@ -96,6 +97,17 @@ class titleBasics(db.Model):
 
     def __repr__(self):
         return f'<titleBasics {self.primaryTitle}>'
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+class nameBasics(db.Model):
+    __tablename__ = 'name_basics'
+    nconst = db.Column(db.String(255), nullable=False, primary_key=True)
+    primary_name = db.Column(db.String(255), nullable=True)
+
+    def __repr__(self):
+        return f'<nameBasics {self.primary_name}>'
 
     def save(self):
         db.session.add(self)
@@ -111,13 +123,20 @@ class titleRatings(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+class TitleDirector(db.Model):
+    __tablename__ = 'title_director'
+    tconst = db.Column(db.String(255), ForeignKey('title_basics.tconst'), nullable=False, primary_key=True)
+    nconst = db.Column(db.String(255), ForeignKey('name_basics.nconst'), nullable=False, primary_key=True)
+    def __repr__(self):
+        return f'<TitleDirector {self.tconst}>'
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 class titleCrew(db.Model):
     __tablename__ = 'title_crew'
-    id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-    tconst = db.Column(db.String(255), nullable=False)
-    directors = db.Column(db.String(255), nullable=True)
-    writers = db.Column(db.String(255), nullable=True)
+    tconst = db.Column(db.String(255), ForeignKey('title_basics.tconst'), nullable=False, primary_key=True)
+    directors = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
         return f'<titleCrew {self.tconst}>'
@@ -128,12 +147,14 @@ class titleCrew(db.Model):
 class TitleJoined(Base):
     __tablename__ = 'title_joined'
     tconst = db.Column(db.String(255), primary_key=True)
+    titleType = db.Column(db.String(100), nullable=True)
     originalTitle = db.Column(db.Text, nullable=True)
     primaryTitle = db.Column(db.Text, nullable=True)
     is_adult = db.Column(db.Boolean, nullable=True)
     start_year = db.Column(db.Integer, nullable=True)
     average_rating = db.Column(db.Float, nullable=True)
     num_votes = db.Column(db.Integer, nullable=True)
+    directors = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return f'<TitleJoined {self.primaryTitle}>'
@@ -188,19 +209,4 @@ class TitleJoined(Base):
 
 
 # imdb_names
-# class nameBasics(db.Model):
-#     __tablename__ = 'name_basics'
-#     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-#     nconst = db.Column(db.String(255), nullable=False)
-#     primary_name = db.Column(db.String(255), nullable=True)
-#     birth_year = db.Column(db.Integer, nullable=True)
-#     death_year = db.Column(db.Integer, nullable=True)
-#     primary_profession = db.Column(db.String(255), nullable=True)
-#     known_for_titles = db.Column(db.String(255), nullable=True)
-#
-#     def __repr__(self):
-#         return f'<nameBasics {self.primary_name}>'
-#
-#     def save(self):
-#         db.session.add(self)
-#         db.session.commit()
+

@@ -14,17 +14,19 @@ namespace StreamingTitles.Api.Controllers
         private readonly ITitlesRepository _titlesRepo;
         private readonly IPlatformRepository _platformRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ILastModificationService _lastModificationService;
         private readonly ILogger<TitlesController> _logger;
         private readonly IMapper _mapper;
         public TitlesController(ITitlesRepository titlesRepo, ILogger<TitlesController> logger, IMapper mapper,
                 IPlatformRepository platformRepository,
-                ICategoryRepository categoriesRepository)
+                ICategoryRepository categoriesRepository, ILastModificationService lastModificationService)
         {
             _titlesRepo = titlesRepo;
             _logger = logger;
             _mapper = mapper;
             _platformRepository = platformRepository;
             _categoryRepository = categoriesRepository;
+            _lastModificationService = lastModificationService;
         }
 
         [HttpGet("{id}")]
@@ -56,6 +58,12 @@ namespace StreamingTitles.Api.Controllers
                     message = ex.Message
                 });
             }
+        }
+        [HttpGet("lastmod")]
+        [ProducesResponseType(typeof(DateTime), 200)]
+        public IActionResult GetLastModified()
+        {
+            return Ok(_lastModificationService.LastModified);
         }
 
         [HttpGet("byYear/{year}")]
@@ -107,7 +115,8 @@ namespace StreamingTitles.Api.Controllers
                     return BadRequest("Start year must be before or equal to end year");
 
                 var titles = await _titlesRepo.GetTitlesByReleaseYearRangeAsync(genres, platforms, startYear, endYear);
-                var titlesDTO = _mapper.Map<List<TitleDTO>>(titles);
+
+                var titlesDTO = _mapper.Map<List<FullTitleInfoDTO>>(titles);
 
                 return Ok(titlesDTO);
             }
