@@ -45,19 +45,16 @@ function Register() {
   }, []);
 
   useEffect(() => {
-    console.log(user);
     const result = USER_REGEX.test(user);
     setValidName(result);
   }, [user]);
 
   useEffect(() => {
-    console.log(email);
     const result = EMAIL_REGEX.test(email);
     setValidEmail(result);
   }, [email]);
 
   useEffect(() => {
-    console.log(pwd);
     const result = PWD_REGEX.test(pwd);
     setValidPwd(result);
     const match = pwd === matchPwd;

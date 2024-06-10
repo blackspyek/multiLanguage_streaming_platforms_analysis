@@ -1,0 +1,82 @@
+version: "3.8"
+services:
+  mysql:
+    image: mysql:5.7
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-uroot", "-proot", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "32000:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: flask_db
+      MYSQL_USER: flask_user
+      MYSQL_PASSWORD: flask_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend-network
+  redis:
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    networks:
+      - backend-network
+  web:
+    build: ./PythonApi/flaskProject
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./PythonApi/flaskProject/data:/app/data
+    networks:
+      - backend-network
+  streamingapi:
+    build: ./StreamingTitles
+    ports:
+      - "5192:5192"
+    depends_on:
+      mysqlnet:
+        condition: service_healthy
+    networks:
+      - backend-network
+    environment:
+      - ASPNETCORE_URLS=http://+:5192
+  mysqlnet:
+    image: mysql:5.7
+    ports:
+      - "32001:3307"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: net_user
+      MYSQL_PASSWORD: net_password
+      MYSQL_PORT: 3307
+      MYSQL_TCP_PORT: 3307
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-uroot", "-proot", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - mysql-data2:/var/lib/mysql
+    networks:
+      - backend-network
+  front:
+    build: ./map-app
+    ports:
+      - "3000:3000"
+    networks:
+      - backend-network
+    depends_on:
+      - web
+      - streamingapi
+networks:
+  backend-network:
+
+volumes:
+  mysql-data:
+  mysql-data2:

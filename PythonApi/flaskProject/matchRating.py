@@ -5,7 +5,6 @@ import json
 import time
 def save_match_rating():
     start = time.time()
-
     if redis_client.get("ratings_loaded") is not None:
         return
 

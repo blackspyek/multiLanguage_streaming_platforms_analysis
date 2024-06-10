@@ -1,12 +1,16 @@
 
 using Asp.Versioning;
+using Microsoft.EntityFrameworkCore;
 using StreamingTitles.Api;
 using StreamingTitles.Data.Helper;
 using StreamingTitles.Data.Model;
 using StreamingTitles.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
+
+// migrate database at runtime
+
+
 
 builder.Services.AddControllers();
 builder.Services.AddTransient<Seed>();
@@ -21,7 +25,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:3000", "http://localhost:5000")
+        builder.WithOrigins("http://front:3000", "http://web:5000", "http://localhost:3000", "http://localhost:5000")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -44,6 +48,13 @@ builder.Services.AddTransient<ICountryRepository, CountryRepository>();
 
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<TitlesContext>();
+    context.Database.Migrate();
+}
+
 if (args.Length == 1 && args[0].ToLower() == "seeddata")
     SeedData(app);
 void SeedData(IHost app)

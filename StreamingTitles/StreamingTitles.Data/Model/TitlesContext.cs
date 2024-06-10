@@ -11,6 +11,8 @@ namespace StreamingTitles.Data.Model
         public TitlesContext()
         {
             _connectionString = "server=localhost;port=3307;database=StreamingTitles;user id=root;password=root";
+            //_connectionString = "server=mysqlnet;port=3307;database=StreamingTitles;user id=root;password=root;SslMode=None";
+            //"default": "server=mysqlnet;port=3307;database=StreamingTitles;user id=root;password=root;SslMode=None"
         }
 
         public TitlesContext(IConfiguration config)

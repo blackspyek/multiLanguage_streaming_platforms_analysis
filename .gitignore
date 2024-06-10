@@ -449,3 +449,5 @@ packages/react-devtools-timeline/dist
 
 PythonApi/flaskProject/app 
 PythonApi/flaskProject/data
+Data/matched_netflix_titles.xml
+PythonApi/flaskProject/.env

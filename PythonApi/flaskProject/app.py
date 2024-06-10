@@ -35,11 +35,11 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
     metadata = MetaData()
     movies_table = Table('rotten_tomatoes_movies', metadata, autoload_with=engine)
     with engine.connect() as conn:
-        result = conn.execute(select(movies_table)).first()
-        if result is None:
-            print("The table 'rotten_tomatoes_movies' is empty. Seeding the table.")
+        result = conn.execute(select(1).select_from(movies_table).limit(1))  # Check existence
+        if result.scalar() is None:
+            print("The table 'title_crew' is empty. Seeding the table.")
         else:
-            print("The table 'rotten_tomatoes_movies' has been cleared.")
+            return
 
 
     def parse_date(date_str):
@@ -92,7 +92,7 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
                             'id': rotten_tomatoes_id,
                             'rotten_tomatoes_link': row.get('rotten_tomatoes_link'),
                             'movie_title': row.get('movie_title'),
-                            'movie_info': row.get('movie_info'),
+                            'movie_info': "",
                             'critics_consensus': row.get('critics_consensus'),
                             'content_rating': row.get('content_rating'),
                             'genres': row.get('genres'),
@@ -113,16 +113,13 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
                             'tomatometer_fresh_critics_count': tomatometer_fresh_critics_count,
                             'tomatometer_rotten_critics_count': tomatometer_rotten_critics_count
                         })
-            with db.session() as insert_session:
-                if entries_to_add:
+            with engine.connect() as conn:
+                with conn.begin():
                     try:
-                        insertSQL = insert(movies_table).values(entries_to_add)
-                        insert_session.execute(insertSQL)
-                        insert_session.commit() # Commit the changes to the database
+                        conn.execute(movies_table.insert(), entries_to_add)
+                    except Exception as e:
+                        print(f"Error inserting chunk: {e}")
 
-                    except IntegrityError as e:
-                        print(f"Error during insert/update: {e}")
-                        insert_session.rollback()
 
     except Exception as e:
         print(f"Error during CSV import: {e}")
@@ -366,9 +363,10 @@ from werkzeug.serving import is_running_from_reloader
 
 def create_app():
 
-    corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://localhost:3000')
+    #corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://localhost:3000')
+    corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://front:3000')
     app = Flask(__name__)
-    CORS(app, supports_credentials=True, origins=[corsOriginsURL])
+    CORS(app, supports_credentials=True, origins=[corsOriginsURL, 'http://localhost:3000'])
 
     app.config.from_prefixed_env()
 
@@ -393,17 +391,12 @@ def create_app():
             validate_database()
             alembic.config.main(argv=['upgrade', 'head'])
             asyncio.run(import_rotten_tomatoes_movies_from_csv('data/rotten_tomatoes_movies.csv'))
-            asyncio.run(import_title_basics_from_tsv('data/title.basics.tsv'))
-            asyncio.run(import_title_ratings_from_tsv('data/title.ratings.tsv'))
-            asyncio.run(import_name_basics_from_tsv('data/name.basics.tsv'))
-            asyncio.run(import_title_crew_from_tsv('data/title.crew.tsv'))
+            asyncio.run(import_title_basics_from_tsv('data/title.basics.filtered.tsv'))
+            asyncio.run(import_title_ratings_from_tsv('data/title.ratings.filtered.tsv'))
+            asyncio.run(import_name_basics_from_tsv('data/name.basics.filtered.tsv'))
+            asyncio.run(import_title_crew_from_tsv('data/title.crew.filtered.tsv'))
             asyncio.run(create_join_table())
             save_match_rating()
-
-
-
-
-
     # load user
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):

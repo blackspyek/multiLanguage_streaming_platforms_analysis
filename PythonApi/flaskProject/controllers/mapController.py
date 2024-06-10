@@ -12,6 +12,7 @@ _map = Blueprint('_map', __name__)
 
 def get_year_with_titles_func():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
+    #API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
     try:
         response = requests.get(f'{API_URL}/api/country/all/movies')
         response.raise_for_status()
@@ -23,6 +24,7 @@ def get_year_with_titles_func():
 @_map.route('/all')
 def get_year_with_titles():
     lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
+    #lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
     lastmodDate = requests.get(lastmodDateURL).json()
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
