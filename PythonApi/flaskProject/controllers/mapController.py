@@ -23,8 +23,8 @@ def get_year_with_titles_func():
 
 @_map.route('/all')
 def get_year_with_titles():
-    lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
-    #lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
+    #lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
+    lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
     lastmodDate = requests.get(lastmodDateURL).json()
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None

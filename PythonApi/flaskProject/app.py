@@ -12,6 +12,7 @@ from controllers.imdbController import imdb
 from controllers.mapController import _map
 from controllers.directorsController import directors
 from controllers.titlesPaginationController import pagination
+from controllers.streamingController import streaming
 from admins import ADMIN_ACCOUNT_USERNAMES_LIST as admin_usernames
 import alembic.config
 from sqlalchemy import create_engine, MetaData, Table, insert
@@ -358,11 +359,11 @@ async def import_title_ratings_from_tsv(tsv_file_path):
 
 
 
-from time import sleep
 from werkzeug.serving import is_running_from_reloader
-
+from time import sleep
 def create_app():
-
+    #Wait for the database to be fully ready
+    sleep(5)
     #corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://localhost:3000')
     corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://front:3000')
     app = Flask(__name__)
@@ -383,6 +384,7 @@ def create_app():
     app.register_blueprint(_map, url_prefix='/map')
     app.register_blueprint(pagination, url_prefix='/paginate')
     app.register_blueprint(directors, url_prefix='/directors')
+    app.register_blueprint(streaming, url_prefix='/streaming')
 
 
 

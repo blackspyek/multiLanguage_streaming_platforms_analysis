@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   mysql:
-    image: mysql:5.7
+    image: mysql:8.4.0
     healthcheck:
       test: ["CMD", "mysqladmin", "-uroot", "-proot", "ping", "-h", "localhost"]
       interval: 10s
@@ -16,6 +16,25 @@ services:
       MYSQL_PASSWORD: flask_password
     volumes:
       - mysql-data:/var/lib/mysql
+    networks:
+      - backend-network
+  mysqlnet:
+    image: mysql:8.4.0
+    ports:
+      - "32001:3307"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: net_user
+      MYSQL_PASSWORD: net_password
+      MYSQL_PORT: 3307
+      MYSQL_TCP_PORT: 3307
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-uroot", "-proot", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - mysql-data2:/var/lib/mysql
     networks:
       - backend-network
   redis:
@@ -46,25 +65,7 @@ services:
       - backend-network
     environment:
       - ASPNETCORE_URLS=http://+:5192
-  mysqlnet:
-    image: mysql:5.7
-    ports:
-      - "32001:3307"
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: net_user
-      MYSQL_PASSWORD: net_password
-      MYSQL_PORT: 3307
-      MYSQL_TCP_PORT: 3307
-    healthcheck:
-      test: ["CMD", "mysqladmin", "-uroot", "-proot", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    volumes:
-      - mysql-data2:/var/lib/mysql
-    networks:
-      - backend-network
+
   front:
     build: ./map-app
     ports:

@@ -133,17 +133,6 @@ class TitleDirector(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
-class titleCrew(db.Model):
-    __tablename__ = 'title_crew'
-    tconst = db.Column(db.String(255), ForeignKey('title_basics.tconst'), nullable=False, primary_key=True)
-    directors = db.Column(db.Text, nullable=True)
-
-    def __repr__(self):
-        return f'<titleCrew {self.tconst}>'
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
 class TitleJoined(Base):
     __tablename__ = 'title_joined'
     tconst = db.Column(db.String(255), primary_key=True)
@@ -154,7 +143,7 @@ class TitleJoined(Base):
     start_year = db.Column(db.Integer, nullable=True)
     average_rating = db.Column(db.Float, nullable=True)
     num_votes = db.Column(db.Integer, nullable=True)
-    directors = db.Column(db.String(255), nullable=True)
+
 
     def __repr__(self):
         return f'<TitleJoined {self.primaryTitle}>'
@@ -162,51 +151,4 @@ class TitleJoined(Base):
     def save(self):
         db.session.add(self)
         db.session.commit()
-"""
-    CHECK IF WE WANT IT
-"""
-
-
-# imdb_movies
-# class titleAkas(db.Model):
-#     __tablename__ = 'title_akas'
-#     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-#     title_id = db.Column(db.String(255), nullable=False)
-#     ordering = db.Column(db.Integer, nullable=True)
-#     title = db.Column(db.String(255), nullable=True)
-#     region = db.Column(db.String(50), nullable=True)
-#     language = db.Column(db.String(50), nullable=True)
-#     types = db.Column(db.String(50), nullable=True)
-#     attributes = db.Column(db.String(50), nullable=True)
-#     is_original_title = db.Column(db.Integer, nullable=True)
-#
-#     def __repr__(self):
-#         return f'<titleAkas {self.title}>'
-#
-#     def save(self):
-#         db.session.add(self)
-#         db.session.commit()
-
-# class titlePrincipals(db.Model):
-#     __tablename__ = 'title_principals'
-#     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid4()))
-#     tconst = db.Column(db.String(255), nullable=False)
-#     ordering = db.Column(db.Integer, nullable=False)
-#     nconst = db.Column(db.String(255), nullable=False)
-#     category = db.Column(db.String(50), nullable=True)
-#     job = db.Column(db.String(50), nullable=True)
-#     characters = db.Column(db.String(255), nullable=True)
-#
-#     def __repr__(self):
-#         return f'<titlePrincipals {self.tconst}>'
-#
-#     def save(self):
-#         db.session.add(self)
-#         db.session.commit()
-
-
-
-
-
-# imdb_names
 

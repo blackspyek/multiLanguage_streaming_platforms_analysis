@@ -9,6 +9,8 @@ from flask_jwt_extended import jwt_required, get_jwt
 from sqlalchemy import or_, extract
 pagination = Blueprint('pagination', __name__)
 
+
+
 SORT_BY = ['over_all', 'imdb_rating', 'tomatometer', 'audience_rating']
 def get_titles():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
@@ -34,8 +36,8 @@ def get_Categories():
         categories = categories.decode('utf-8')
         return jsonify(json.loads(categories)), 200
     try:
-        response = requests.get(f'http://localhost:5192/api/category')
-        #response = requests.get(f'http://streamingapi:5192/api/category')
+        #response = requests.get(f'http://localhost:5192/api/category')
+        response = requests.get(f'http://streamingapi:5192/api/category')
         response.raise_for_status()
         data = response.json()
         redis_client.set('categories', json.dumps(data))
@@ -58,8 +60,8 @@ def get_year_with_titles():
     sort = params.get('sort')
     _type = params.get('type')
     selectedGenres = params.get('genres')
-    lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
-    #lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
+    #lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
+    lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
     lastmodDate = requests.get(lastmodDateURL).json()
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None

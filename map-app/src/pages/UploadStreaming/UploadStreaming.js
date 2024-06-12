@@ -13,6 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import CategoryModal from "../../components/CategoryModal/CategoryModal";
 import PlatformModal from "../../components/PlatformModal/PlatformModal";
+import { axiosPrivate } from "../../api/axios";
 export default function UploadStreaming() {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState({ started: false, pc: 0 });
@@ -39,10 +40,26 @@ export default function UploadStreaming() {
   const [showPlatformModal, setShowPlatformModal] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState("");
+
+  const fetchPlatforms = async () => {
+    const controller = new AbortController();
+    const ALL_PLATFORMS_URL = `streaming/allPlatforms`;
+
+    try {
+      const response = await axiosPrivate.get(ALL_PLATFORMS_URL, {
+        signal: controller.signal,
+      });
+      setPlatforms(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
-    axios.get("http://localhost:5192/api/platform").then((res) => {
-      setPlatforms(res.data);
-    });
+    try {
+      fetchPlatforms();
+    } catch (err) {
+      console.log(err);
+    }
   }, []);
   useEffect(() => {
     if (rowsNumber === null) {

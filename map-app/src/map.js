@@ -10,7 +10,6 @@ import geoUrl from "./map.json";
 // from map.json file i want to extract country name and its coordinates
 import markers from "./points.json";
 import { axiosPrivate } from "./api/axios";
-import chroma from "chroma-js";
 const COUNTRIES_AVG_URL = "/map/all";
 
 const MapChart = () => {
@@ -20,9 +19,6 @@ const MapChart = () => {
 
   const [minRating, setMinRating] = useState(0);
   const [maxRating, setMaxRating] = useState(0);
-  const colorScale = chroma
-    .scale(["red", "yellow", "green"])
-    .domain([minRating, maxRating]);
 
   useEffect(() => {
     let isMounted = true;
@@ -94,7 +90,7 @@ const MapChart = () => {
               onMouseEnter={() => setHoveredMarker(index)}
               onMouseLeave={() => setHoveredMarker(null)}
             >
-              <circle r={2} fill={colorScale(countryRatings[index].rating)} />
+              <circle r={2} fill={"red"} />
 
               {hoveredMarker === index && (
                 <text
