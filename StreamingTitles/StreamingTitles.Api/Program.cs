@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // migrate database at runtime
 //sleep so mysql can start
-//System.Threading.Thread.Sleep(5000);
+System.Threading.Thread.Sleep(5000);
 
 
 builder.Services.AddControllers();
