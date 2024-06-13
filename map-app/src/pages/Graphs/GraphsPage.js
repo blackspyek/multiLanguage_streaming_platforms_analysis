@@ -32,6 +32,7 @@ function Graphs() {
   const [yearRange, setYearRange] = useState([2000, 2024]);
 
   const [BestMovieDirectors, setBestMovieDirectors] = useState([]);
+  const [BestRatedMovies, setBestRatedMovies] = useState([]);
   const [type, setType] = useState("movie");
 
   ChartJS.register(
@@ -110,6 +111,35 @@ function Graphs() {
       controller.abort();
     };
   }, [axiosPrivate, type]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const getBestRatedMovies = async () => {
+      try {
+        const response = await axiosPrivate.get("/bestRated/best", {
+          signal: controller.signal,
+          // params: {
+          //   best,
+          // },
+        });
+        if (isMounted) {
+          setBestRatedMovies(response.data);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getBestRatedMovies();
+
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [axiosPrivate]);
 
   useEffect(() => {
     let isMounted = true;
@@ -252,6 +282,53 @@ function Graphs() {
                         "rgba(255, 206, 86, 0.5)",
                         "rgba(75, 192, 192, 0.5)",
                         "rgba(153, 102, 255, 0.5)",
+                      ],
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
+          <div>
+            <h1>Best Rated Movies</h1>
+            {/* <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className={classes.select}
+            >
+              { <option value="movie">Movie</option>
+              <option value="tvSeries">TV Show</option> }
+            </select> */}
+            <div>
+              <PolarArea
+                datasetIdKey="bestRatedMovies"
+                options={{
+                  maintainAspectRatio: false,
+                  radius: 1,
+                  hoverRadius: 20,
+                }}
+                data={{
+                  labels: BestRatedMovies.map(
+                    (movie) => movie.movie_name
+                  ),
+                  datasets: [
+                    {
+                      id: 1,
+                      label: "Average Rating",
+                      data: BestRatedMovies.map(
+                        (movie) => movie.average_rating
+                      ),
+                      backgroundColor: [
+                        "rgba(255, 0, 0, 1)",
+                        "rgba(255, 0, 51, 1)",
+                        "rgba(255, 51, 0, 1)",
+                        "rgba(255, 51, 51, 1)",
+                        "rgba(255, 102, 0, 1)",
+                        "rgba(255, 102, 15, 1)",
+                        "rgba(255, 153, 0, 1)",
+                        "rgba(255, 153, 15, 1)",
+                        "rgba(255, 204, 0, 1)",
+                        "rgba(255, 204, 51, 1)",
                       ],
                     },
                   ],
