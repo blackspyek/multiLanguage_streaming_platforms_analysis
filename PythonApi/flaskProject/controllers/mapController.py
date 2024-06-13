@@ -29,11 +29,15 @@ def get_year_with_titles():
     lastmodDate = requests.get(f'{API_URL}/api/titles/lastmod').json()
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
-    if redis_client.get('country_avg_rating') is not None or lastSaved == lastmodDate:
-        country_avg_rating = redis_client.get('country_avg_rating')
-        country_avg_rating = country_avg_rating.decode('utf-8')
-        return jsonify(json.loads(country_avg_rating)), 200
+    if redis_client.get('titles_with_ratings_loaded') == True and redis_client.get('country_avg_rating') is not None or lastSaved == lastmodDate :
+        try:
+            country_avg_rating = redis_client.get('country_avg_rating')
+            country_avg_rating = country_avg_rating.decode('utf-8')
+            return jsonify(json.loads(country_avg_rating)), 200
+        except:
+            return jsonify({'message': 'No data found'}), 404
     data = get_year_with_titles_func()
+    redis_client.set('titles_with_ratings_loaded', True)
     if not data:
         return jsonify({'message': 'No data found'}), 404
     country_avg_rating = {}

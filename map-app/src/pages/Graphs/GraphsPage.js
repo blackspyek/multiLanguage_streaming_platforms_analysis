@@ -341,7 +341,7 @@ function Graphs() {
           <div>
             <h1>Categories Avg For Each Platform</h1>
             <select
-              value={type}
+              value={category}
               onChange={(e) => setCategory(e.target.value)}
               className={classes.select}
             >
