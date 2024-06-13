@@ -25,3 +25,4 @@ def get_platforms_func():
         return data
     except requests.exceptions.HTTPError as err:
         print(err)
+

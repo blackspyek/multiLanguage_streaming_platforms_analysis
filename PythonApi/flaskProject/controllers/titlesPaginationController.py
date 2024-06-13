@@ -31,6 +31,57 @@ def get_titles():
         return data
     except requests.exceptions.HTTPError as err:
         print(err)
+
+@pagination.route('/avgcategory')
+def calculate_platform_category_ratings():
+    params = request.args
+    categoryname = params.get('category')
+    if redis_client.get('category_ratings') is None:
+        if redis_client.get('titles_with_ratings') is None:
+            get_year_with_titles()
+        data = json.loads(redis_client.get('titles_with_ratings'))
+        platform_category_ratings = {}
+
+        for item in data:
+            for platform_info in item["titlePlatform"]:
+                platform_name = platform_info["platform"]["name"]
+                if platform_name not in platform_category_ratings.keys():
+                    platform_category_ratings[platform_name] = {}
+                for category_info in item["titleCategory"]:
+                    category_name = category_info["category"]["name"]
+                    if category_name not in platform_category_ratings[platform_name].keys():
+                        platform_category_ratings[platform_name][category_name] = []
+                    if item["over_all"] is not None:
+                        platform_category_ratings[platform_name][category_name].append(item["over_all"])
+
+        for platform, categories in platform_category_ratings.items():
+            for category, ratings in categories.items():
+                try:
+                    platform_category_ratings[platform][category] = round(sum(ratings) / len(ratings), 2)
+                except ZeroDivisionError:
+                    print(f'Error calculating average for {category} on {platform} with ratings {ratings}')
+
+        redis_client.set('category_ratings', json.dumps(platform_category_ratings))
+    else:
+        platform_category_ratings = json.loads(redis_client.get('category_ratings'))
+
+    platform_categories = {}
+    AllPlatforms = {}
+    for platform, categories in platform_category_ratings.items():
+        for category, rating in categories.items():
+            if categoryname is not None and categoryname != '' and category == categoryname:
+                platform_categories[platform] = rating
+                if category not in AllPlatforms.keys():
+                    AllPlatforms[category] = []
+                AllPlatforms[category].append(rating)
+
+    for category, ratings in AllPlatforms.items():
+        try:
+            AllPlatforms = round(sum(ratings) / len(ratings), 2)
+        except ZeroDivisionError:
+            print(f'Error calculating average for {category} with ratings {ratings}')
+    platform_categories['AllPlatforms'] = AllPlatforms
+    return jsonify(platform_categories), 200
 @pagination.route('/categories')
 @jwt_required()
 def get_Categories():
@@ -48,7 +99,6 @@ def get_Categories():
     except requests.exceptions.HTTPError as err:
         print(err)
         return jsonify({'message': 'No data found'}), 404
-
 
 @pagination.route('/all')
 @jwt_required()
@@ -278,5 +328,6 @@ def download_titles_xml():
     response.headers['Content-Disposition'] = 'attachment; filename=titles.xml'
     response.headers['Content-Type'] = 'application/xml'
     return response
+
 
 

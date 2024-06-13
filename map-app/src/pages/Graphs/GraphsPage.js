@@ -12,8 +12,9 @@ import {
   PointElement,
   LineElement,
   RadialLinearScale,
+  BarElement,
 } from "chart.js";
-import { Chart, Line, PolarArea } from "react-chartjs-2";
+import { Bar, Chart, Line, PolarArea } from "react-chartjs-2";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
@@ -34,6 +35,12 @@ function Graphs() {
   const [BestMovieDirectors, setBestMovieDirectors] = useState([]);
   const [type, setType] = useState("movie");
 
+  const [category, setCategory] = useState("action");
+  const [categoryAvg, setCategoryAvg] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
+
+  const [genres, setGenres] = useState([]);
+
   ChartJS.register(
     ArcElement,
     Tooltip,
@@ -42,7 +49,8 @@ function Graphs() {
     LinearScale,
     PointElement,
     LineElement,
-    RadialLinearScale
+    RadialLinearScale,
+    BarElement
   );
 
   useEffect(() => {
@@ -83,6 +91,48 @@ function Graphs() {
       controller.abort();
     };
   }, [axiosPrivate, years]);
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+    const getAvgPerCategory = async () => {
+      try {
+        const response = await axiosPrivate.get("/paginate/avgcategory", {
+          signal: controller.signal,
+          params: {
+            category,
+          },
+        });
+        setPlatforms(Object.keys(response.data));
+        setCategoryAvg(Object.values(response.data));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const fetchGenres = async () => {
+      const controller = new AbortController();
+      const GENRES_URL = `paginate/categories`;
+      try {
+        const response = await axiosPrivate.get(GENRES_URL, {
+          signal: controller.signal,
+        });
+        var names = response.data.map((item) => item.name);
+        setGenres(names);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchGenres();
+
+    getAvgPerCategory();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [axiosPrivate, category]);
+
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
@@ -253,6 +303,43 @@ function Graphs() {
                         "rgba(75, 192, 192, 0.5)",
                         "rgba(153, 102, 255, 0.5)",
                       ],
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
+          <div>
+            <h1>Categories Avg For Each Platform</h1>
+            <select
+              value={type}
+              onChange={(e) => setCategory(e.target.value)}
+              className={classes.select}
+            >
+              {genres.map((genre) => (
+                <option key={genre} value={genre}>
+                  {genre}
+                </option>
+              ))}
+            </select>
+            <div
+              className={classes.bargraph}
+              style={{ width: "200px", height: "200px" }}
+            >
+              <Bar
+                datasetIdKey="avgCategory"
+                options={{
+                  maintainAspectRatio: false,
+                  radius: 1,
+                  hoverRadius: 10,
+                }}
+                data={{
+                  labels: platforms,
+                  datasets: [
+                    {
+                      id: 1,
+                      data: categoryAvg,
+                      label: ["Avg"],
                     },
                   ],
                 }}
