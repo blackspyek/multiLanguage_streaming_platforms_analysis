@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models import titleBasics, titleRatings, TitleJoined
 from extensions import redis_client, session
-from matchRating import get_average_rating_by_year, get_years_avg
+from graphHelpers.matchRating import get_average_rating_by_year, get_years_avg
 from flask_jwt_extended import jwt_required, get_jwt
 import requests
 import os

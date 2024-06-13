@@ -5,15 +5,14 @@ import Login from "./pages/Login/LoginPage";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Map from "./map";
-import NotFound from "./components/NotFound";
 import RequireAuth from "./components/RequireAuth";
 import Unauthorized from "./components/Unauthorized";
-import Admin from "./components/Admin";
 import PersistLogin from "./components/PersistLogin";
 import Home from "./pages/Home/HomePage";
 import UploadStreaming from "./pages/UploadStreaming/UploadStreaming";
 import Graphs from "./pages/Graphs/GraphsPage";
 import Catalog from "./pages/Catalog/CatalogPage";
+import NotFound from "./components/NotFound/NotFound";
 const ROLES = {
   ADMIN: "admin",
   USER: "user",
@@ -35,7 +34,6 @@ function App() {
 
           {/* private routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.ADMIN]} />}>
-            <Route path="admin" element={<Admin />} />
             <Route path="uploadstream" element={<UploadStreaming />} />
           </Route>
         </Route>

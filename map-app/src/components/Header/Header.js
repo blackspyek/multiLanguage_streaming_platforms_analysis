@@ -12,7 +12,6 @@ export default function Header() {
       <nav>
         {Object.keys(auth).length != 0 ? (
           <>
-            {auth?.role === "admin" && <Link to="/admin">Admin</Link>}
             {auth?.role === "admin" && (
               <>
                 <Link to="/uploadstream">Streaming</Link>

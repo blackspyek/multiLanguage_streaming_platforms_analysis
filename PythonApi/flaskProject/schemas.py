@@ -49,7 +49,7 @@ class RottenTomatoesMoviesSchema(Schema):
 
 class titleAkasSchema(Schema):
     id = fields.String()
-    title_id = fields.String() #a tconst,
+    title_id = fields.String()
     ordering = fields.Integer(allow_none=True)
     title = fields.String(allow_none=True)
     region = fields.String(allow_none=True)
@@ -66,35 +66,35 @@ class titleBasicsSchema(Schema):
 
 class titleCrewSchema(Schema):
     id = fields.String()
-    tconst = fields.String() # alphanumeric unique identifier of the title
-    directors = fields.String(allow_none=True) # directors of the given title
-    writers = fields.String(allow_none=True) # writers of the given title
+    tconst = fields.String()
+    directors = fields.String(allow_none=True)
+    writers = fields.String(allow_none=True)
 
 class titlePrincipalsSchema(Schema):
     id = fields.String()
-    tconst = fields.String() # alphanumeric unique identifier of the title
-    ordering = fields.Integer() # a number to uniquely identify rows for a given titleId
-    nconst = fields.String() # alphanumeric unique identifier of the name/person
-    category = fields.String(allow_none=True) # the category of job that person was in
-    job = fields.String(allow_none=True) # the specific job title if applicable, else '\N'
-    characters = fields.String(allow_none=True) # the name of the character played if applicable, else '\N'
+    tconst = fields.String()
+    ordering = fields.Integer()
+    nconst = fields.String()
+    category = fields.String(allow_none=True)
+    job = fields.String(allow_none=True)
+    characters = fields.String(allow_none=True)
 
 class titleRatingsSchema(Schema):
     id = fields.String()
-    tconst = fields.String() # alphanumeric unique identifier of the title
-    averageRating = fields.Float(allow_none=True) # weighted average of all the individual user ratings
-    numVotes = fields.Integer(allow_none=True) # number of votes the title has received
+    tconst = fields.String()
+    averageRating = fields.Float(allow_none=True)
+    numVotes = fields.Integer(allow_none=True)
 
 #imdb_names
 
 class nameBasicsSchema(Schema):
     id = fields.String()
-    nconst = fields.String() # alphanumeric unique identifier of the name/person
-    primaryName = fields.String(allow_none=True) # name by which the person is most often credited
-    birthYear = fields.Integer(allow_none=True) # in YYYY format
-    deathYear = fields.Integer(allow_none=True) # in YYYY format if applicable, else '\N'
-    primaryProfession = fields.String(allow_none=True) # the top-3 professions of the person
-    knownForTitles = fields.String(allow_none=True) # titles the person is known for
+    nconst = fields.String()
+    primaryName = fields.String(allow_none=True)
+    birthYear = fields.Integer(allow_none=True)
+    deathYear = fields.Integer(allow_none=True)
+    primaryProfession = fields.String(allow_none=True)
+    knownForTitles = fields.String(allow_none=True)
 
 class titleBasicsRatingSchema(Schema):
     tconst = fields.String()

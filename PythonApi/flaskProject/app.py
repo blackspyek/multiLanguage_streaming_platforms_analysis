@@ -4,29 +4,21 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from extensions import db, jwt, validate_database, create_join_table
 
-from auth import auth
+from controllers.authController import auth
 from models import User, TokenBlocklist, RottenTomatoesMovies
-from users import users
-from rotten_tomatoes_movies import rotten_tomatoes_movies
-from controllers.imdbController import imdb
-from controllers.mapController import _map
-from controllers.directorsController import directors
-from controllers.titlesPaginationController import pagination
-from controllers.streamingController import streaming
+from blueprints import register_blueprints
 from admins import ADMIN_ACCOUNT_USERNAMES_LIST as admin_usernames
 import alembic.config
-from sqlalchemy import create_engine, MetaData, Table, insert
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import select
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-import functools
 import asyncio
 import os
 import datetime
 import csv
 import pandas as pd
-from matchRating import save_match_rating
+from graphHelpers.matchRating import save_match_rating
 async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
     start_time = time.time()  # Start timing
     alembic_cfg = alembic.config.Config('alembic.ini')
@@ -41,7 +33,6 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
             print("The table 'title_crew' is empty. Seeding the table.")
         else:
             return
-
 
     def parse_date(date_str):
         try:
@@ -361,9 +352,11 @@ async def import_title_ratings_from_tsv(tsv_file_path):
 
 from werkzeug.serving import is_running_from_reloader
 from time import sleep
+from alembic.config import Config
 def create_app():
     #Wait for the database to be fully ready
     sleep(5)
+
     #corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://localhost:3000')
     corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://front:3000')
     app = Flask(__name__)
@@ -377,15 +370,7 @@ def create_app():
 
 
     # Registering the blueprint section
-    app.register_blueprint(auth, url_prefix='/auth')
-    app.register_blueprint(users, url_prefix='/users')
-    app.register_blueprint(rotten_tomatoes_movies, url_prefix='/rotten')
-    app.register_blueprint(imdb, url_prefix='/imdb')
-    app.register_blueprint(_map, url_prefix='/map')
-    app.register_blueprint(pagination, url_prefix='/paginate')
-    app.register_blueprint(directors, url_prefix='/directors')
-    app.register_blueprint(streaming, url_prefix='/streaming')
-
+    register_blueprints(app)
 
 
     with app.app_context():

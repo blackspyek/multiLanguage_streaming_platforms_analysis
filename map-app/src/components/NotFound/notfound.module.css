@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+.notfound {
+  color: red;
+  font-family: "Inter", sans-serif;
+  font-size: 2rem;
+}
+
+.linkhome {
+  color: rgb(185, 48, 48) !important;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+  border: 1px solid rgb(177, 36, 36);
+}
+
+.linkhome:hover {
+  background-color: rgb(177, 36, 36);
+  color: white !important;
+}

@@ -12,6 +12,9 @@ pagination = Blueprint('pagination', __name__)
 
 
 SORT_BY = ['over_all', 'imdb_rating', 'tomatometer', 'audience_rating']
+API_URL = os.getenv('API_URL', 'http://localhost:5192')
+# API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
+
 def get_titles():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
     #API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
@@ -36,8 +39,8 @@ def get_Categories():
         categories = categories.decode('utf-8')
         return jsonify(json.loads(categories)), 200
     try:
-        #response = requests.get(f'http://localhost:5192/api/category')
-        response = requests.get(f'http://streamingapi:5192/api/category')
+
+        response = requests.get(f'{API_URL}/api/category')
         response.raise_for_status()
         data = response.json()
         redis_client.set('categories', json.dumps(data))
@@ -61,8 +64,9 @@ def get_year_with_titles():
     _type = params.get('type')
     selectedGenres = params.get('genres')
     #lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
-    lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
-    lastmodDate = requests.get(lastmodDateURL).json()
+    #lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
+    lastmodDate = requests.get(f'{API_URL}/api/titles/lastmod').json()
+
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
     if redis_client.get('titles_with_ratings') is None or lastSaved != lastmodDate:
@@ -211,8 +215,68 @@ def download_titles():
     return response
 
 
+import xml.etree.ElementTree as ET
 
+@pagination.route('/download/xml')
+@jwt_required()
+def download_titles_xml():
+    params = request.args
+    startYear = params.get('startYear')
+    endYear = params.get('endYear')
+    sortBy = params.get('sortBy')
+    sort = params.get('sort')
+    _type = params.get('type')
+    selectedGenres = params.get('genres')
+    if redis_client.get('titles_with_ratings') is None:
+        return jsonify({'message': 'No data found'}), 404
+    else:
+        data = json.loads(redis_client.get('titles_with_ratings'))
 
+    if selectedGenres is not None and selectedGenres != '':
+        genres = selectedGenres.split(',')
+        genres = [int(genre) for genre in genres]
+        data = [
+            title for title in data if any(
+                category["category"]["id"] in genres for category in title["titleCategory"]
+            )
+        ]
 
+    if _type is not None and _type != '':
+        data = [title for title in data if title['type'] == _type]
+    try:
+        if startYear is not None and startYear != '' and endYear is not None and endYear != '':
+            data = [title for title in data if
+                    title['release_Year'] >= int(startYear) and title['release_Year'] <= int(endYear)]
+    except:
+        return jsonify({'message': f'{startYear} or {endYear} is not a number'}), 400
+
+    if sortBy is not None and sortBy != '' and sortBy in SORT_BY:
+        def sort_key(x):
+            return (x.get(sortBy) is None, x.get(sortBy) if sort == "asc" else -x.get(sortBy) if isinstance(x.get(sortBy), (int, float)) else x.get(sortBy))
+        data = sorted(data, key=sort_key)
+
+    # Create XML structure
+    root = ET.Element("Titles")
+    for title in data:
+        title_element = ET.SubElement(root, "Title")
+        for key, value in title.items():
+            if isinstance(value, list):
+                list_element = ET.SubElement(title_element, key)
+                for item in value:
+                    item_element = ET.SubElement(list_element, "Item")
+                    for k, v in item.items():
+                        sub_item_element = ET.SubElement(item_element, k)
+                        sub_item_element.text = str(v)
+            else:
+                element = ET.SubElement(title_element, key)
+                element.text = str(value)
+
+    # Generate the XML string
+    xml_data = ET.tostring(root, encoding='utf-8')
+
+    response = make_response(xml_data)
+    response.headers['Content-Disposition'] = 'attachment; filename=titles.xml'
+    response.headers['Content-Type'] = 'application/xml'
+    return response
 
 

@@ -118,13 +118,17 @@ select {
   z-index: 1;
   bottom: -4rem;
   right: 2rem;
+}
+.tableHandle {
+  position: relative;
+}
+
+.downloadButtons {
   padding: 0.5rem;
   cursor: pointer;
   background-color: white;
   color: black;
   font-family: "Inter";
   border-radius: 5px;
-}
-.tableHandle {
-  position: relative;
+  margin-right: 1rem;
 }

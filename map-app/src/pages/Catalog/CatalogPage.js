@@ -10,6 +10,8 @@ import { saveAs } from "file-saver";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "react-toastify";
+import axios from "../../api/axios";
+import UpdatedDataInfo from "../../components/UpdatedDataInfo/UpdatedDataInfo";
 
 export default function Catalog() {
   const { auth } = useAuth();
@@ -28,11 +30,36 @@ export default function Catalog() {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [sort, setSort] = useState("asc");
   const [sortBy, setSortBy] = useState("");
+  const [lastDataUpdate, setLastDataUpdate] = useState("");
+  const [showUpdate, setShowUpdate] = useState(false);
 
   const handleYearRangeChange = (newRange) => {
     setYearRange(newRange);
-    console.log(newRange);
   };
+
+  useEffect(() => {
+    const UPDATE_DATE_URL = `http://localhost:5192/api/titles/lastmod`;
+
+    const fetchDataUpdateDate = async () => {
+      try {
+        if (lastDataUpdate === "") {
+          return;
+        }
+        const lastmod = await axios.get(UPDATE_DATE_URL);
+        if (lastDataUpdate !== lastmod.data) {
+          setShowUpdate(true);
+          console.log(`Data updated at: ${lastmod.data} ${lastDataUpdate}`);
+        }
+      } catch (error) {
+        console.error("Error fetching data update date:", error);
+      }
+    };
+
+    fetchDataUpdateDate();
+    const intervalId = setInterval(fetchDataUpdateDate, 20000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     fetchGenres();
@@ -46,7 +73,6 @@ export default function Catalog() {
     }
     const ALL_TITLES_URL = `paginate/download`;
     try {
-      console.log(currentPage);
       const response = await axiosPrivate.get(ALL_TITLES_URL, {
         params: {
           startYear: yearRange[0],
@@ -68,6 +94,33 @@ export default function Catalog() {
     }
   };
 
+  const downloadTitlesXML = async () => {
+    if (titles.length === 0) {
+      toast.error("No titles to download");
+      return;
+    }
+    const ALL_TITLES_URL = `paginate/download/xml`;
+    try {
+      const response = await axiosPrivate.get(ALL_TITLES_URL, {
+        params: {
+          startYear: yearRange[0],
+          endYear: yearRange[1],
+          sortBy: sortBy,
+          sort: sort,
+          type: type,
+          genres: selectedGenres.join(","),
+        },
+        responseType: "blob",
+      });
+      const blob = new Blob([response.data], {
+        type: "application/xml",
+      });
+      saveAs(blob, "titles.xml");
+      toast.success("Downloaded titles.xml");
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const fetchGenres = async () => {
     const controller = new AbortController();
     const GENRES_URL = `paginate/categories`;
@@ -76,7 +129,6 @@ export default function Catalog() {
         signal: controller.signal,
       });
       setGenres(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -84,8 +136,8 @@ export default function Catalog() {
   const fetchTitles = async () => {
     const controller = new AbortController();
     const ALL_TITLES_URL = `paginate/all`;
+    const UPDATE_DATE_URL = `http://localhost:5192/api/titles/lastmod`;
     try {
-      console.log(currentPage);
       const response = await axiosPrivate.get(ALL_TITLES_URL, {
         params: {
           pageNumber: currentPage,
@@ -99,10 +151,12 @@ export default function Catalog() {
         },
         signal: controller.signal,
       });
+
+      const lastmod = await axios.get(UPDATE_DATE_URL);
+      setLastDataUpdate(lastmod.data);
       setTitles(response.data.items);
       setTotalItems(response.data.totalElements);
       setTotalPages(response.data.totalPages);
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -193,10 +247,23 @@ export default function Catalog() {
             </button>
           </div>
           <div className={classes.tableHandle}>
-            <button className={classes.downloadButton} onClick={downloadTitles}>
-              <FontAwesomeIcon icon={faDownload} />
-              <span> Download JSON</span>
-            </button>
+            <div className={classes.downloadButton}>
+              <button
+                onClick={downloadTitles}
+                className={classes.downloadButtons}
+              >
+                <FontAwesomeIcon icon={faDownload} />
+                <span> Download JSON</span>
+              </button>
+              <button
+                onClick={downloadTitlesXML}
+                className={classes.downloadButtons}
+              >
+                <FontAwesomeIcon icon={faDownload} />
+                <span> Download XML</span>
+              </button>
+            </div>
+            <UpdatedDataInfo dataUpdated={showUpdate} />
             <table>
               <thead>
                 <tr>
