@@ -12,10 +12,8 @@ _map = Blueprint('_map', __name__)
 
 def get_year_with_titles_func():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
-    #API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
     try:
         response = requests.get(f'{API_URL}/api/country/all/movies')
-
         response.raise_for_status()
         data = response.json()
         return data
@@ -25,20 +23,27 @@ def get_year_with_titles_func():
 @_map.route('/all')
 def get_year_with_titles():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
-    # API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
     lastmodDate = requests.get(f'{API_URL}/api/titles/lastmod').json()
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
-    if redis_client.get('country_avg_rating') is not None or lastSaved == lastmodDate :
+
+    TestFlag = os.getenv('TEST', 1)
+    while redis_client.get("map_updating") == "True":
+        print("Map updating")
+        pass
+    if (redis_client.get('country_avg_rating') is not None and lastSaved == lastmodDate) or TestFlag == 1:
         try:
             country_avg_rating = redis_client.get('country_avg_rating')
             country_avg_rating = country_avg_rating.decode('utf-8')
             return jsonify(json.loads(country_avg_rating)), 200
         except:
             pass
+    
+    redis_client.set('titles_with_ratings_lastmod', lastmodDate)
     data = get_year_with_titles_func()
     if not data:
         return jsonify({'message': 'No data found'}), 404
+    redis_client.set('map_updating', "True")
     country_avg_rating = {}
     titles_that_dont_exist = []
     for country, titles in data.items():
@@ -82,6 +87,7 @@ def get_year_with_titles():
     redis_client.set('country_avg_rating', json.dumps(country_avg_rating))
 
     country_avg_rating['titles_that_dont_exist'] = titles_that_dont_exist
+    redis_client.set('map_updating', "False")
 
     return jsonify(country_avg_rating), 200
 

@@ -120,6 +120,9 @@ async def import_rotten_tomatoes_movies_from_csv(csv_file_path):
     print(f"Time taken for import: {end_time - start_time} seconds")
 
 
+# TODO: Flag TEST in ENV
+# TODO: FIX Info about updateded data
+
 def process_chunk_names(args):
     chunk, movies_table, db = args  # Unpack arguments
     entries_to_add = []
@@ -357,7 +360,6 @@ def create_app():
     #Wait for the database to be fully ready
     sleep(5)
 
-    #corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://localhost:3000')
     corsOriginsURL = os.getenv('CORS_ORIGINS_URL', 'http://front:3000')
     app = Flask(__name__)
     CORS(app, supports_credentials=True, origins=[corsOriginsURL, 'http://localhost:3000'])
@@ -375,14 +377,31 @@ def create_app():
 
     with app.app_context():
         if not is_running_from_reloader():
+            print("Validating database")
             validate_database()
+            print("Database validated")
+            print("Running migrations")
             alembic.config.main(argv=['upgrade', 'head'])
+            print("Migrations complete")
+            print("Importing data to rotten_tomatoes")
             asyncio.run(import_rotten_tomatoes_movies_from_csv('data/rotten_tomatoes_movies.csv'))
+            print("Importing data to rotten_tomatoes complete")
+            print("Importing data to title_basics")
             asyncio.run(import_title_basics_from_tsv('data/title.basics.filtered.tsv'))
+            print("Importing data to title_basics complete")
+            print("Importing data to title_ratings")
             asyncio.run(import_title_ratings_from_tsv('data/title.ratings.filtered.tsv'))
+            print("Importing data to title_ratings complete")
+            print("Importing data to name_basics")
             asyncio.run(import_name_basics_from_tsv('data/name.basics.filtered.tsv'))
+            print("Importing data to name_basics complete")
+            print("Importing data to title_crew")
             asyncio.run(import_title_crew_from_tsv('data/title.crew.filtered.tsv'))
+            print("Importing data to title_crew complete")
+            print("Creating join table")
             asyncio.run(create_join_table())
+            print("Join table created")
+            print("Saving match rating")
             save_match_rating()
     # load user
     @jwt.user_lookup_loader

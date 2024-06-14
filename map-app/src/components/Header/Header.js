@@ -14,7 +14,7 @@ export default function Header() {
           <>
             {auth?.role === "admin" && (
               <>
-                <Link to="/uploadstream">Streaming</Link>
+                <Link to="/uploadstream">Upload</Link>
               </>
             )}
             <Link to="/graphs">Graphs</Link>

@@ -17,7 +17,6 @@ def get_platforms():
 
 def get_platforms_func():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
-    #API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
     try:
         response = requests.get(f'{API_URL}/api/platform')
         response.raise_for_status()

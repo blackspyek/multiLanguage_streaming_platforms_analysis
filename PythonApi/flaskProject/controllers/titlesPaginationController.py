@@ -13,11 +13,9 @@ pagination = Blueprint('pagination', __name__)
 
 SORT_BY = ['over_all', 'imdb_rating', 'tomatometer', 'audience_rating']
 API_URL = os.getenv('API_URL', 'http://localhost:5192')
-# API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
 
 def get_titles():
     API_URL = os.getenv('API_URL', 'http://localhost:5192')
-    #API_URL = os.getenv('API_URL', 'http://streamingapi:5192')
     params = {}
     if redis_client.get('titles') is not None:
         titles = redis_client.get('titles')
@@ -27,21 +25,23 @@ def get_titles():
         response = requests.get(f'{API_URL}/api/titles', params=params)
         response.raise_for_status()
         data = response.json()
+        if data is None or len(data) == 0:
+            return None
         redis_client.set('titles', json.dumps(data))
         return data
     except requests.exceptions.HTTPError as err:
         print(err)
-
 @pagination.route('/avgcategory')
 def calculate_platform_category_ratings():
     params = request.args
     categoryname = params.get('category')
     if redis_client.get('category_ratings') is None:
         if redis_client.get('titles_with_ratings') is None:
-            get_year_with_titles()
+            (res, status) = get_year_with_titles()
+            if status == 404:
+                return jsonify({'message': 'No data found'}), 404
         data = json.loads(redis_client.get('titles_with_ratings'))
         platform_category_ratings = {}
-
         for item in data:
             for platform_info in item["titlePlatform"]:
                 platform_name = platform_info["platform"]["name"]
@@ -99,7 +99,75 @@ def get_Categories():
     except requests.exceptions.HTTPError as err:
         print(err)
         return jsonify({'message': 'No data found'}), 404
+def get_titles_with_ratings():
+    data = get_titles()
+    if data is None:
+        redis_client.delete('updating')
+        return None
+    redis_client.delete('titles_with_ratings')
+    redis_client.set('updating', "True")
+    for title in data:
+        title_variations = [
+            title['titleName'],
+            title['titleName'].replace(" ", "-"),
+            title['titleName'].replace("-", " "),
+            title['titleName'].replace(",", ":"),
+        ]
+        year_variations = [
+            title['release_Year'] - 1,
+            title['release_Year'] - 2,
+            title['release_Year'] - 3,
+            title['release_Year'] - 4,
+            title['release_Year'] - 5,
+            title['release_Year'],
+            title['release_Year'] + 1,
+            title['release_Year'] + 2,
+            title['release_Year'] + 3,
+            title['release_Year'] + 4,
+            title['release_Year'] + 5
+        ]
+        query = session.query(TitleJoined).filter(
+            TitleJoined.start_year.in_(year_variations),
+            or_(
+                (TitleJoined.primaryTitle.in_(title_variations)),
+                (TitleJoined.originalTitle.in_(title_variations))
+            )
+        ).first()
+        over_all = (0, 0)
 
+        if query:
+            title['imdb_rating'] = query.average_rating
+            over_all = (over_all[0] + query.average_rating, over_all[1] + 1)
+        else:
+            title['imdb_rating'] = 0
+        rotten_tomatoes_query = session.query(RottenTomatoesMovies).filter(
+            RottenTomatoesMovies.movie_title.in_(title_variations),
+            extract('year', RottenTomatoesMovies.original_release_date).in_(year_variations)
+        ).first()
+
+        if rotten_tomatoes_query:
+            if rotten_tomatoes_query.tomatometer_rating is None:
+                title['tomatometer'] = 0
+            else:
+                title['tomatometer'] = rotten_tomatoes_query.tomatometer_rating / 10
+
+            if rotten_tomatoes_query.audience_rating is None:
+                title['audience_rating'] = 0
+            else:
+                title['audience_rating'] = rotten_tomatoes_query.audience_rating / 10
+            if title['audience_rating'] > 0 or title['tomatometer'] > 0:
+                over_all = (over_all[0] + title['tomatometer'] + title['audience_rating'], over_all[1] + 2)
+        else:
+            title['tomatometer'] = None
+            title['audience_rating'] = None
+        if over_all[1] > 0:
+            title['over_all'] = round(over_all[0] / over_all[1], 2)
+        else:
+            title['over_all'] = None
+    # save to redis
+    redis_client.set('titles_with_ratings', json.dumps(data))
+    redis_client.delete('updating')
+    return json.dumps(data)
 @pagination.route('/all')
 @jwt_required()
 def get_year_with_titles():
@@ -113,77 +181,22 @@ def get_year_with_titles():
     sort = params.get('sort')
     _type = params.get('type')
     selectedGenres = params.get('genres')
-    #lastmodDateURL = "http://localhost:5192/api/titles/lastmod"
-    #lastmodDateURL = "http://streamingapi:5192/api/titles/lastmod"
     lastmodDate = requests.get(f'{API_URL}/api/titles/lastmod').json()
 
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
+    TestFlag = os.getenv('TEST', 1)
     if redis_client.get('titles_with_ratings') is None or lastSaved != lastmodDate:
-        redis_client.set('titles_with_ratings_lastmod', lastmodDate)
-        data = get_titles()
-        for title in data:
-            title_variations = [
-                title['titleName'],
-                title['titleName'].replace(" ", "-"),
-                title['titleName'].replace("-", " "),
-                title['titleName'].replace(",", ":"),
-            ]
-            year_variations = [
-                title['release_Year'] - 1,
-                title['release_Year'] - 2,
-                title['release_Year'] - 3,
-                title['release_Year'] - 4,
-                title['release_Year'] - 5,
-                title['release_Year'],
-                title['release_Year'] + 1,
-                title['release_Year'] + 2,
-                title['release_Year'] + 3,
-                title['release_Year'] + 4,
-                title['release_Year'] + 5
-            ]
-            query = session.query(TitleJoined).filter(
-                TitleJoined.start_year.in_(year_variations),
-                or_(
-                    (TitleJoined.primaryTitle.in_(title_variations)),
-                    (TitleJoined.originalTitle.in_(title_variations))
-                )
-            ).first()
-            over_all = (0, 0)
-
-            if query:
-                title['imdb_rating'] = query.average_rating
-                over_all = (over_all[0] + query.average_rating, over_all[1] + 1)
-            else:
-                title['imdb_rating'] = 0
-            rotten_tomatoes_query = session.query(RottenTomatoesMovies).filter(
-                RottenTomatoesMovies.movie_title.in_(title_variations),
-                extract('year', RottenTomatoesMovies.original_release_date).in_(year_variations)
-            ).first()
-
-            if rotten_tomatoes_query:
-                if rotten_tomatoes_query.tomatometer_rating is None:
-                    title['tomatometer'] = 0
-                else:
-                    title['tomatometer'] = rotten_tomatoes_query.tomatometer_rating / 10
-
-                if rotten_tomatoes_query.audience_rating is None:
-                    title['audience_rating'] = 0
-                else:
-                    title['audience_rating'] = rotten_tomatoes_query.audience_rating / 10
-                if title['audience_rating'] > 0 or title['tomatometer'] > 0:
-                    over_all = (over_all[0] + title['tomatometer'] + title['audience_rating'], over_all[1] + 2)
-            else:
-                title['tomatometer'] = None
-                title['audience_rating'] = None
-            if over_all[1] > 0:
-                title['over_all'] = round(over_all[0] / over_all[1], 2)
-            else:
-                title['over_all'] = None
-        # save to redis
-        redis_client.set('titles_with_ratings', json.dumps(data))
+        if TestFlag == 0:
+            redis_client.set('titles_with_ratings_lastmod', lastmodDate)
+            data = get_titles_with_ratings()
+            if data is None:
+                return jsonify({'message': 'No data found'}), 404
     else:
         data = json.loads(redis_client.get('titles_with_ratings'))
+
+    while redis_client.get('updating') == "True":
+        pass
     if selectedGenres is not None and selectedGenres != '':
         genres = selectedGenres.split(',')
         genres = [int(genre) for genre in genres]

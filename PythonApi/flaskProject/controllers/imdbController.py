@@ -13,11 +13,9 @@ def get_years_func():
 @imdb.route('/all')
 @jwt_required()
 def get_movies_ratings_by_year():
-
     claims = get_jwt()
     if claims['role'] != 'admin':
         return jsonify({'message': 'You are not authorized to access this resource'}), 403
-
     data = get_years_avg()
     return jsonify(data), 200
 

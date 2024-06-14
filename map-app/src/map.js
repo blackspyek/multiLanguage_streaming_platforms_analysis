@@ -7,25 +7,24 @@ import {
 } from "react-simple-maps";
 
 import geoUrl from "./map.json";
-// from map.json file i want to extract country name and its coordinates
 import markers from "./points.json";
 import { axiosPrivate } from "./api/axios";
+import { toast } from "react-toastify";
 const COUNTRIES_AVG_URL = "/map/all";
 
 const MapChart = () => {
   const [hoveredMarker, setHoveredMarker] = useState(null);
 
   const [countryRatings, setCountryRatings] = useState([]);
-  // const [countryRatings, setCountryRatings] = useState({});
 
   const [minRating, setMinRating] = useState(0);
-  const [maxRating, setMaxRating] = useState(0);
+  const [maxRating, setMaxRating] = useState(1);
 
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
 
-    const getRottenYears = async () => {
+    const getMapData = async () => {
       try {
         const response = await axiosPrivate.get(COUNTRIES_AVG_URL, {
           signal: controller.signal,
@@ -42,11 +41,15 @@ const MapChart = () => {
           setCountryRatings(countryRatings);
         }
       } catch (err) {
-        console.log(err);
+        try {
+          if (err.response.status === 404) {
+            toast.error("No data available for the map");
+          }
+        } catch {}
       }
     };
 
-    getRottenYears();
+    getMapData();
     return () => {
       isMounted = false;
       controller.abort();
@@ -63,16 +66,12 @@ const MapChart = () => {
 
     const scale = (rating - minRating) / (maxRating - minRating);
     if (scale <= 0.25) {
-      // Interpolate between red and orange
       return interpolateColor(red, orange, scale / 0.25);
     } else if (scale <= 0.5) {
-      // Interpolate between orange and yellow
       return interpolateColor(orange, yellow, (scale - 0.25) / 0.25);
     } else if (scale <= 0.75) {
-      // Interpolate between yellow and green
       return interpolateColor(yellow, green, (scale - 0.5) / 0.25);
     } else {
-      // Use green
       return `rgb(${green[0]},${green[1]},${green[2]})`;
     }
   };
@@ -82,13 +81,8 @@ const MapChart = () => {
     return `rgb(${result[0]},${result[1]},${result[2]})`;
   };
 
-
   return (
-    <ComposableMap
-      projectionConfig={{
-        scale: 160,
-      }}
-    >
+    <ComposableMap projectionConfig={{ scale: 160 }}>
       <Geographies geography={geoUrl}>
         {({ geographies }) =>
           geographies.map((geo, index) => (

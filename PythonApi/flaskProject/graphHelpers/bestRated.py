@@ -6,7 +6,7 @@ from json import loads, dumps  # Add import statements
 
 
 def get_bestRated(type = "best"):
-    cache_key = "best_title_ratings"  # Updated cache key
+    cache_key = "best_title_ratings"
     cache_key = f"{cache_key}_{type}"
     #delete cache_key
     redis_client.delete(cache_key)

@@ -41,6 +41,7 @@ function Graphs() {
   const [platforms, setPlatforms] = useState([]);
 
   const [genres, setGenres] = useState([]);
+  const [error, setError] = useState("");
 
   ChartJS.register(
     ArcElement,
@@ -105,8 +106,9 @@ function Graphs() {
         });
         setPlatforms(Object.keys(response.data));
         setCategoryAvg(Object.values(response.data));
+        setError("");
       } catch (err) {
-        console.log(err);
+        setError("Streaming data not found! Upload data first.");
       }
     };
 
@@ -340,6 +342,13 @@ function Graphs() {
           </div>
           <div>
             <h1>Categories Avg For Each Platform</h1>
+            <h2>
+              {error && (
+                <span style={{ color: "red" }}>
+                  Streaming data not found! Upload data first.
+                </span>
+              )}
+            </h2>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
