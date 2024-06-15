@@ -1,8 +1,12 @@
 from models import titleBasics, titleRatings
 from extensions import redis_client, db
 from sqlalchemy import func
+import os
 import json
 async def save_match_rating():
+    TestFlag = os.getenv('TEST', "1")
+    if redis_client.exists("ratings_by_year") and TestFlag == "1":
+        return
     result = db.session.query(
                 titleBasics.start_year,
                 func.avg(titleRatings.average_rating).label('avg_rating')

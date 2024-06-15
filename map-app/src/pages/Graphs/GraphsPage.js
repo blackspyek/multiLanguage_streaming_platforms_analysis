@@ -171,9 +171,6 @@ function Graphs() {
       try {
         const response = await axiosPrivate.get("/bestRated/best", {
           signal: controller.signal,
-          // params: {
-          //   best,
-          // },
         });
         if (isMounted) {
           setBestRatedMovies(response.data);
@@ -202,7 +199,6 @@ function Graphs() {
         });
         if (isMounted) {
           var data = response.data;
-          console.log(data);
           data.sort((a, b) => a.year - b.year);
           var testYears = data.map((item) => item.year);
           var testRating = data.map((item) => item.avg);
@@ -386,14 +382,6 @@ function Graphs() {
           </div>
           <div>
             <h1>Best Rated Movies</h1>
-            {/* <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className={classes.select}
-            >
-              { <option value="movie">Movie</option>
-              <option value="tvSeries">TV Show</option> }
-            </select> */}
             <div>
               <PolarArea
                 datasetIdKey="bestRatedMovies"
