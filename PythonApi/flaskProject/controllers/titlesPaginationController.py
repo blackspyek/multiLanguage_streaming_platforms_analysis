@@ -35,8 +35,11 @@ def get_titles():
 def calculate_platform_category_ratings():
     params = request.args
     categoryname = params.get('category')
-    if redis_client.get('category_ratings') is None:
-        if redis_client.get('titles_with_ratings') is None:
+    lastmodDate = requests.get(f'{API_URL}/api/titles/lastmod').json()
+    lastSaved = redis_client.get('titles_with_ratings_lastmod')
+    TestFlag = os.getenv('TEST', "1")
+    if redis_client.get('category_ratings') is None or (TestFlag == "0" and lastSaved != lastmodDate):
+        if redis_client.get('titles_with_ratings') is None :
             (res, status) = get_year_with_titles()
             if status == 404:
                 return jsonify({'message': 'No data found'}), 404
@@ -88,7 +91,10 @@ def get_Categories():
     if redis_client.get('categories') is not None:
         categories = redis_client.get('categories')
         categories = categories.decode('utf-8')
-        return jsonify(json.loads(categories)), 200
+        if len(categories) < 0:
+            redis_client.delete('categories')
+        else:
+            return jsonify(json.loads(categories)), 200
     try:
         response = requests.get(f'{API_URL}/api/category')
         response.raise_for_status()
@@ -186,9 +192,12 @@ def get_year_with_titles():
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
     TestFlag = os.getenv('TEST', "1")
     if redis_client.get('titles_with_ratings') is None or (TestFlag == "0" and lastSaved != lastmodDate):
+        return jsonify({'message': 'No data found'}), 404
         redis_client.set('titles_with_ratings_lastmod', lastmodDate)
         data = get_titles_with_ratings()
         if data is None:
+            redis_client.delete('titles_with_ratings')
+            redis_client.delete('updating')
             return jsonify({'message': 'No data found'}), 404
     else:
         data = json.loads(redis_client.get('titles_with_ratings'))

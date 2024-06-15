@@ -7,6 +7,7 @@ from sqlalchemy_utils import database_exists, create_database
 from alembic.config import Config
 import redis
 import requests
+from sqlalchemy.sql import select
 # Database manager
 from time import time
 
@@ -26,7 +27,9 @@ async def create_join_table():
     # Check if table exists before creating
     is_exists = inspect(engine).has_table('title_joined')
     if is_exists:
-        return
+        with engine.connect() as connection:
+            connection.execute(text("DROP TABLE title_joined"))
+    
 
     metadata = db.metadata
 

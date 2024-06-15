@@ -42,10 +42,11 @@ def get_year_with_titles():
     redis_client.set('titles_with_ratings_lastmod', lastmodDate)
     data = get_year_with_titles_func()
     if not data:
+        redis_client.delete('country_avg_rating')
+        redis_client.delete('map_updating')
         return jsonify({'message': 'No data found'}), 404
     redis_client.set('map_updating', "True")
     country_avg_rating = {}
-    titles_that_dont_exist = []
     for country, titles in data.items():
         total_rating = 0
         count = 0
@@ -80,14 +81,13 @@ def get_year_with_titles():
             if query:
                 total_rating += query.average_rating
                 count += 1
-            else:
-                titles_that_dont_exist.append("Title: " + title['titleName'] + " Year: " + str(title['release_Year']))
         if count > 0:
             country_avg_rating[country] = total_rating / count
+    
     redis_client.set('country_avg_rating', json.dumps(country_avg_rating))
 
-    country_avg_rating['titles_that_dont_exist'] = titles_that_dont_exist
     redis_client.set('map_updating', "False")
+    
 
     return jsonify(country_avg_rating), 200
 
