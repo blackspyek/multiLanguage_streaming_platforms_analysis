@@ -27,7 +27,6 @@ function Graphs() {
   const axiosPrivate = useAxiosPrivate();
   const [years, setYears] = useState([]);
   const [yearsAvg, setAvg] = useState([]);
-  const [rottenYears, setRottenYears] = useState([]);
   const [rottenAudienceRating, setRottenAudienceRating] = useState([]);
   const [rottenTomatometerRating, setRottenTomatometerRating] = useState([]);
   const [yearRange, setYearRange] = useState([2000, 2024]);
@@ -203,6 +202,7 @@ function Graphs() {
         });
         if (isMounted) {
           var data = response.data;
+          console.log(data);
           data.sort((a, b) => a.year - b.year);
           var testYears = data.map((item) => item.year);
           var testRating = data.map((item) => item.avg);

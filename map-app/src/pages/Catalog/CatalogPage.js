@@ -56,10 +56,9 @@ export default function Catalog() {
         console.error("Error fetching data update date:", error);
       }
     };
-    console.log("fetching titles");
 
     fetchDataUpdateDate();
-    const intervalId = setInterval(fetchDataUpdateDate, 20000);
+    const intervalId = setInterval(fetchDataUpdateDate, 5000);
   }, []);
 
   useEffect(() => {
@@ -155,7 +154,6 @@ export default function Catalog() {
 
       const lastmod = await axios.get(UPDATE_DATE_URL);
       setLastDataUpdate(lastmod.data);
-      console.log(`Data updated at: ${lastmod.data}`);
       setTitles(response.data.items);
       setTotalItems(response.data.totalElements);
       setTotalPages(response.data.totalPages);
@@ -164,6 +162,9 @@ export default function Catalog() {
         if (error.response.status === 404) {
           setTitles([]);
           toast.error("No data found, you need to upload data first.");
+        }
+        if (error.response.status === 400) {
+          toast.error("Refresh the page!");
         }
       } catch (error) {
         toast.error(
