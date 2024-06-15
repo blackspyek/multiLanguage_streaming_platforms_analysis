@@ -402,7 +402,7 @@ def create_app():
             asyncio.run(create_join_table())
             print("Join table created")
             print("Saving match rating")
-            save_match_rating()
+            asyncio.run(save_match_rating())
     # load user
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):

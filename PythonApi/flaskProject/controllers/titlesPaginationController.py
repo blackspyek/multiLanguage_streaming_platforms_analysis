@@ -90,7 +90,6 @@ def get_Categories():
         categories = categories.decode('utf-8')
         return jsonify(json.loads(categories)), 200
     try:
-
         response = requests.get(f'{API_URL}/api/category')
         response.raise_for_status()
         data = response.json()
@@ -185,13 +184,12 @@ def get_year_with_titles():
 
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
-    TestFlag = os.getenv('TEST', 1)
-    if redis_client.get('titles_with_ratings') is None or lastSaved != lastmodDate:
-        if TestFlag == 0:
-            redis_client.set('titles_with_ratings_lastmod', lastmodDate)
-            data = get_titles_with_ratings()
-            if data is None:
-                return jsonify({'message': 'No data found'}), 404
+    TestFlag = os.getenv('TEST', "1")
+    if redis_client.get('titles_with_ratings') is None or (TestFlag == "0" and lastSaved != lastmodDate):
+        redis_client.set('titles_with_ratings_lastmod', lastmodDate)
+        data = get_titles_with_ratings()
+        if data is None:
+            return jsonify({'message': 'No data found'}), 404
     else:
         data = json.loads(redis_client.get('titles_with_ratings'))
 

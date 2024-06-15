@@ -2,9 +2,7 @@ from models import titleBasics, titleRatings
 from extensions import redis_client, db
 from sqlalchemy import func
 import json
-def save_match_rating():
-    if redis_client.get("ratings_loaded") is not None:
-        return
+async def save_match_rating():
     result = db.session.query(
                 titleBasics.start_year,
                 func.avg(titleRatings.average_rating).label('avg_rating')
@@ -16,7 +14,6 @@ def save_match_rating():
     ratings_by_year = [{"year": row.start_year, "avg": float(row.avg_rating)} for row in result if row.start_year is not None]
     ratings_by_year_str = json.dumps(ratings_by_year)
     redis_client.set("ratings_by_year", ratings_by_year_str)
-    redis_client.set("ratings_loaded", 1)
     print(f"Updated ratings by year for the graph")
 
 def get_average_rating_by_year(year):

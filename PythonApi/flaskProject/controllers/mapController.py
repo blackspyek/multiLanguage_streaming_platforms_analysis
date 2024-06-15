@@ -27,11 +27,11 @@ def get_year_with_titles():
     lastSaved = redis_client.get('titles_with_ratings_lastmod')
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
 
-    TestFlag = os.getenv('TEST', 1)
+    TestFlag = os.getenv('TEST', "1")
     while redis_client.get("map_updating") == "True":
         print("Map updating")
         pass
-    if (redis_client.get('country_avg_rating') is not None and lastSaved == lastmodDate) or TestFlag == 1:
+    if TestFlag == "1" or (redis_client.get('country_avg_rating') is not None and lastSaved == lastmodDate):
         try:
             country_avg_rating = redis_client.get('country_avg_rating')
             country_avg_rating = country_avg_rating.decode('utf-8')

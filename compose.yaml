@@ -43,6 +43,8 @@ services:
       - "6379:6379"
     networks:
       - backend-network
+    volumes:
+      - ./RedisData:/data
   web:
     build: ./PythonApi/flaskProject
     ports:
