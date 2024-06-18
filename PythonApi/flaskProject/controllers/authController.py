@@ -23,8 +23,10 @@ def register_user():
     new_user.generate_password(
         password=data['password']
     )
-    new_user.save()
-
+    try:
+        new_user.save()
+    except:
+        return jsonify({'message': 'User already exists!'}), 400
 
     return jsonify({'message': f'User {new_user.username} created successfully!'}), 201
 
