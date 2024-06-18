@@ -36,6 +36,13 @@ export default function Catalog() {
   const handleYearRangeChange = (newRange) => {
     setYearRange(newRange);
   };
+  useEffect(() => {
+    const asyncFunc = async () => {
+      const CACHED_DATE = `paginate/latestdate`;
+      const lastmod = await axiosPrivate.get(CACHED_DATE);
+      setLastDataUpdate(lastmod.data);
+    };
+  }, []);
 
   useEffect(() => {
     const UPDATE_DATE_URL = `http://localhost:5192/api/titles/lastmod`;
@@ -48,9 +55,6 @@ export default function Catalog() {
         const lastmod = await axios.get(UPDATE_DATE_URL);
         if (lastDataUpdate !== lastmod.data) {
           setShowUpdate(true);
-          console.log(`Data updated at: ${lastmod.data} ${lastDataUpdate}`);
-        } else {
-          console.log(`Data not updated at: ${lastmod.data} ${lastDataUpdate}`);
         }
       } catch (error) {
         console.error("Error fetching data update date:", error);
