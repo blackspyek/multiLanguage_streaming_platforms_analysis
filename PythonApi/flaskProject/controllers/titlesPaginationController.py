@@ -192,10 +192,10 @@ def get_year_with_titles():
     lastSaved = lastSaved.decode('utf-8') if lastSaved is not None else None
     TestFlag = os.getenv('TEST', "1")
     if redis_client.get('titles_with_ratings') is None or (TestFlag == "0" and lastSaved != lastmodDate):
-        return jsonify({'message': 'No data found'}), 404
         redis_client.set('titles_with_ratings_lastmod', lastmodDate)
         data = get_titles_with_ratings()
         if data is None:
+            print('No data found', "\n"*10)
             redis_client.delete('titles_with_ratings')
             redis_client.delete('updating')
             return jsonify({'message': 'No data found'}), 404
@@ -348,6 +348,10 @@ def download_titles_xml():
     response.headers['Content-Disposition'] = 'attachment; filename=titles.xml'
     response.headers['Content-Type'] = 'application/xml'
     return response
-
+@pagination.route('/latestdate')
+@jwt_required()
+def get_latest_date():
+    lastmodDate = requests.get(f'{API_URL}/api/titles/lastmod').json()
+    return jsonify(lastmodDate), 200
 
 

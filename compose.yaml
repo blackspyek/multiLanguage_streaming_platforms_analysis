@@ -57,7 +57,7 @@ services:
     networks:
       - backend-network
     environment:
-      - TEST=0
+      - TEST=1
   streamingapi:
     build: ./StreamingTitles
     ports:
